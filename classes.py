@@ -63,11 +63,11 @@ class Vector:
     def len(self, base):
         return Point.distance(base.initial_point, self)
     
-    def __add__(self, another_point: __init__):
-        return Point(
-            c1 = self.c1 + another_point.c1,
-            c2 = self.c2 + another_point.c2,
-            c3 = self.c3 + another_point.c3
+    def __add__(self, another_vec: __init__):
+        return Vector(
+            c1 = self.c1 + another_vec.c1,
+            c2 = self.c2 + another_vec.c2,
+            c3 = self.c3 + another_vec.c3
         )
     
     def __mul__(self, scalar_or_vector: __init__):
@@ -100,7 +100,7 @@ class Vector:
         len = self.len(base)
         if len != 0:
             return Vector(
-                c1= c1/len, c2=c2/len, c3=c3/len
+                c1= self.c1/len, c2=self.c2/len, c3=self.c3/len
             )
         print({"msg": "division by zero"})
         sys.exit()
