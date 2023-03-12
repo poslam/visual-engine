@@ -12,10 +12,6 @@ class Point:
     def distance(point1: __init__, point2: __init__):
         return ((point1.c1 - point2.c1)**2 + (point1.c2 - point2.c2)**2 
                 + (point1.c3 - point2.c3)**2)**0.5
-        
-    # def distance(self, point2: __init__):
-    #     return ((self.c1 - point2.c1)**2 + (self.c2 - point2.c2)**2 
-    #             + (self.c3 - point2.c3)**2)**0.5
             
     def __add__(self, another_point: __init__):
         return Point(
@@ -43,12 +39,9 @@ class Point:
             c2 = self.c2 / scalar,
             c3 = self.c3 / scalar
         )
-        
-class VectorSpace:
-    def __init__(self, point: Point):
-        self.initial_point = point
             
-class Vector():
+          
+class Vector:
     def __init__(self, c1: float = None,
                  c2: float = None, c3: float = None):
         if type(c1) == int or type(c1) == float:
@@ -67,8 +60,8 @@ class Vector():
     def as_point(self):
         return Point(c1 = self.c1, c2 = self.c2, c3 = self.c3)
     
-    def len(self):
-        return Point.distance(VectorSpace.initial_point, self)
+    def len(self, base):
+        return Point.distance(base.initial_point, self)
     
     def __add__(self, another_point: __init__):
         return Point(
@@ -103,24 +96,64 @@ class Vector():
     def mixed_mul(vec1: __init__, vec2: __init__, vec3: __init__):
         return vec1 * (vec2 ** vec3)
         
-    # смешанное произведение
+    def norm(self, base):
+        len = self.len(base)
+        return Vector(
+            c1= c1/len, c2=c2/len, c3=c3/len
+        )
+        
+        
+class VectorSpace:
+    def __init__(self, initial_point: Point,
+                 e1: Vector, e2: Vector, e3: Vector):
+        self.initial_point = initial_point
+        self.e1 = self.norm(e1)
+        self.e2 = self.norm(e2)
+        self.e3 = self.norm(e3)
+        # self.e1 = e1
+        # self.e2 = e2
+        # self.e3 = e3
+        
+    def len(self, point2: Point):
+        return Point.distance(self.initial_point, point2)
+    
+    def norm(self, vec: Vector):
+        len = self.len(vec.as_point())
+        return Vector(
+            c1=vec.c1/len, c2=vec.c2/len, c3=vec.c3/len
+        )
+        
+
+class Camera:
+    def __init__(self, position: Point, look_dir: Vector, 
+                 look_at: Point, fov: float, k: float,
+                 draw_distance: float):
+        self.position = position
+        self.look_dir = look_dir
+        self.look_at = look_at
+        self.fov = fov
+        self.vfov = fov*k
+        # k - коэфициент сжатия
+        self.draw_distance = draw_distance
+        
+    def send_rays(self, amount_rays: int):
+        pass
     
     
+base = VectorSpace(
+    initial_point=Point(0, 0, 0),
+    e1=Vector(2, 3, 5),
+    e2=Vector(0, 1, 0),
+    e3=Vector(0, 0, 1)
+    )
     
 
-
+# point1 = VectorSpace().initial_point
     
-    
-point= Point(c1 = 0, c2 = 0, c3 = 0)
 
-VectorSpace.initial_point = point
-
-point1 = Point(
-    c1 = 1, c2 = 1, c3 = 1
-)
 
 vec1 = Vector(
-    point1
+    point
 )
 
 vec2 = Vector(
@@ -131,4 +164,4 @@ vec3 = Vector(
     c1=32, c2=33, c3=21
 )
 
-print(Vector.mixed_mul(vec1, vec2, vec3))
+print(base.e1.len(base))
