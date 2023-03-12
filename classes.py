@@ -98,9 +98,12 @@ class Vector:
         
     def norm(self, base):
         len = self.len(base)
-        return Vector(
-            c1= c1/len, c2=c2/len, c3=c3/len
-        )
+        if len != 0:
+            return Vector(
+                c1= c1/len, c2=c2/len, c3=c3/len
+            )
+        print({"msg": "division by zero"})
+        sys.exit()
         
         
 class VectorSpace:
@@ -119,9 +122,12 @@ class VectorSpace:
     
     def norm(self, vec: Vector):
         len = self.len(vec.as_point())
-        return Vector(
-            c1=vec.c1/len, c2=vec.c2/len, c3=vec.c3/len
-        )
+        if len != 0:
+            return Vector(
+                c1=vec.c1/len, c2=vec.c2/len, c3=vec.c3/len
+            )
+        print({"msg": "division by zero"})
+        sys.exit()
         
 
 class Camera:
@@ -132,7 +138,7 @@ class Camera:
         self.look_dir = look_dir
         self.look_at = look_at
         self.fov = fov
-        self.vfov = fov*k
+        self.vfov = 2/3*fov*k
         # k - коэфициент сжатия
         self.draw_distance = draw_distance
         
@@ -140,28 +146,14 @@ class Camera:
         pass
     
     
-base = VectorSpace(
-    initial_point=Point(0, 0, 0),
-    e1=Vector(2, 3, 5),
-    e2=Vector(0, 1, 0),
-    e3=Vector(0, 0, 1)
-    )
+class Object:
+    def __init__(self, position: Point, rotation: Vector,
+                 obj_points: list):
+        self.position = position
+        self.rotation = position
+        self.obj_points = obj_points
+        
+    def contains(self, point: Point):
+        return point in self.obj_points
     
-
-# point1 = VectorSpace().initial_point
     
-
-
-vec1 = Vector(
-    point
-)
-
-vec2 = Vector(
-    c1=3, c2=2, c3=2
-)
-
-vec3 = Vector(
-    c1=32, c2=33, c3=21
-)
-
-print(base.e1.len(base))
