@@ -10,11 +10,11 @@ class Point:
     def as_list(self):
         return [self.c1, self.c2, self.c3]
     
-    def distance(self, point: __init__):
+    def distance(self, point: 'Point'):
         return ((self.c1 - point.c1)**2 + (self.c2 - point.c2)**2 
                 + (self.c3 - point.c3)**2)**0.5
             
-    def __add__(self, another_point: __init__):
+    def __add__(self, another_point: 'Point'):
         return Point(
             c1 = self.c1 + another_point.c1,
             c2 = self.c2 + another_point.c2,
