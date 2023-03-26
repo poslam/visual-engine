@@ -2,8 +2,7 @@ from classes import *
 
 m1 = Matrix([[1, 2], [3, 4]])
 m2 = Matrix([[2, 3], [1, 0]])
-m3 = Matrix([[1, 2, 3], [2, 3, 1], [5, 89, 0]])
-m4 = Matrix([[3, 4, 5], [4, 56, 1]])
+m3 = Matrix([[1, 2, 3], [2, 3, 1], [5, 1, 0]])
 
 v1 = Vector([1, 2, 3])
 v2 = Vector([5, 6, 0])
@@ -13,6 +12,19 @@ v4 = Vector([[0], [0], [1]])
 vs = VectorSpace([Vector([1, 0, 0]), Vector([0, 1, 0]), Vector([0, 0, 1])])
 
 p1 = Point([1, 1, 1])
+
+print("m1", m1)
+print("m2", m2)
+print("m3", m3, '\n')
+
+print("v1", v1)
+print("v2", v2)
+print("v3", v3)
+print("v4", v4, '\n')
+
+print("vs", "VectorSpace([Vector([1, 0, 0]), Vector([0, 1, 0]), Vector([0, 0, 1])])\n")
+
+print("p1", p1, '\n')
 
 zero = Matrix.zero_matrix(2, 5)
 print("zero = Matrix.zero_matrix(2, 5)", zero)
@@ -84,3 +96,5 @@ print("v1+p1", v1+p1)
 print("p1+v1", p1+v1)
 
 print("p1-v1", p1-v1)
+
+print("vs.as_vector(p1)", vs.as_vector(p1))

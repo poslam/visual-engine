@@ -1,12 +1,15 @@
 from typing import Union
 
+
 @property
 def restricted(obj: str):
     raise AttributeError(f'{obj.__class__} does not have this attribite')
 
 
 class Matrix:
-    def __init__(self, data: list[list[float]]):
+    def __init__(self, data: Union[list[list[float]], 'Vector', 'Point']):
+        if isinstance(data, Point) or isinstance(data, Vector):
+            data = [data.values]
         self.data = data
         self.rows = len(data)
         self.columns = len(data[0])
@@ -265,7 +268,7 @@ class Vector(Matrix):
     determinant = restricted
     inverse = restricted
     gram = restricted
-    
+
 
 def BilinearForm(matrix: Matrix, vec1: Vector, vec2: Vector):
     if matrix.rows == matrix.columns and matrix.rows == vec1.size and \
@@ -282,48 +285,64 @@ class Point(Vector):
     def __add__(self, vector: Vector):
         if isinstance(vector, Vector):
             if self.size == vector.size:
-                return Point([self.values[i]+vector.values[i] 
-                            for i in range(self.size)])
+                return Point([self.values[i]+vector.values[i]
+                              for i in range(self.size)])
             raise Exception("wrong sizes")
         raise Exception("wrong usage of addition")
-    
+
     def __radd__(self, vector: Vector):
         if isinstance(vector, Vector):
             if self.size == vector.size:
-                return Point([self.values[i]+vector.values[i] 
-                            for i in range(self.size)])
+                return Point([self.values[i]+vector.values[i]
+                              for i in range(self.size)])
             raise Exception("wrong sizes")
         raise Exception("wrong usage of addition")
-    
+
     def __sub__(self, vector: Vector):
         if isinstance(vector, Vector):
             if self.size == vector.size:
-                return Point([self.values[i]-vector.values[i] 
-                            for i in range(self.size)])
+                return Point([self.values[i]-vector.values[i]
+                              for i in range(self.size)])
             raise Exception("wrong sizes")
         raise Exception("wrong usage of addition")
 
-    
     __mul__ = restricted
     __rmul__ = restricted
-    transpose = restricted
     __and__ = restricted
     __pow__ = restricted
+    transpose = restricted
     len = restricted
-    
+
 
 class VectorSpace:
     def __init__(self, basis: list[Vector]):
-        self.basis = basis
+        self.basis = Matrix([vec.values for vec in basis])
+        self.size = len(basis)
 
     def scalar_product(self, vec1: 'Vector', vec2: 'Vector'):
-        basis = Matrix([vec.values for vec in self.basis])
-        return (vec1.transpose().as_matrix*Matrix.gram(basis)*vec2.as_matrix)[0][0]
+        if vec1.type == 'v' and vec2.type == 'v':
+            return (vec1.transpose().as_matrix*Matrix.gram(self.basis)*vec2.as_matrix)[0][0]
+        elif vec1.type == 'h' and vec2.type == 'h':
+            return (vec1.as_matrix*Matrix.gram(self.basis)*vec2.transpose().as_matrix)[0][0]
+        elif vec1.type == 'v' and vec2.type == 'h':
+            return (vec1.transpose().as_matrix*Matrix.gram(self.basis)*vec2.transpose().as_matrix)[0][0]
+        elif vec1.type == 'h' and vec2.type == 'v':
+            return (vec1.as_matrix*Matrix.gram(self.basis)*vec2.as_matrix)[0][0]
 
     def as_vector(self, point: Point):
-        pass
+        if point.size == self.size:
+            result = Matrix.zero_matrix(1, point.size)
+            det = self.basis.determinant()
+            for column in range(point.size):
+                temp_matrix = self.basis.copy().transpose()
+                for row in range(point.size):
+                    temp_matrix[row][column] = point[row]
+                result[0][column] = temp_matrix.determinant() / det
+            return Vector(result)
+        raise Exception("wrong sizes")
 
-# проверить, что такое as_vector в видео
 
 class CoorinateSystem:
-    pass
+    def __init__(self, initial_point: Point, vs: VectorSpace):
+        self.initial_point = initial_point
+        self.vs = vs
