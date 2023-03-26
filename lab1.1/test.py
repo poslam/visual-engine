@@ -98,3 +98,6 @@ print("p1+v1", p1+v1)
 print("p1-v1", p1-v1)
 
 print("vs.as_vector(p1)", vs.as_vector(p1))
+
+m4 = Matrix([[1, 2], [2, 3], [4]])
+print(m4)

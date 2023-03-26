@@ -13,6 +13,9 @@ class Matrix:
         self.data = data
         self.rows = len(data)
         self.columns = len(data[0])
+        for i in range(self.rows-1):
+            if len(self.data[i]) != len(self.data[i+1]):
+                raise Exception("not rectangular matrix")
 
     def zero_matrix(rows: int, columns: int):
         data = [[0 for j in range(columns)] for i in range(rows)]
@@ -115,7 +118,7 @@ class Matrix:
         else:
             matrix = self
 
-        if len(matrix) == len(matrix):
+        if len(matrix) == len(matrix[0]):
             if len(matrix) == 2:
                 return matrix[0][0]*matrix[1][1] - matrix[0][1]*matrix[1][0]
 
