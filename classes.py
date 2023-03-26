@@ -1,5 +1,9 @@
 from typing import Union
 
+@property
+def restricted(obj: str):
+    raise AttributeError(f'{obj.__class__} does not have this attribite')
+
 
 class Matrix:
     def __init__(self, data: list[list[float]]):
@@ -53,12 +57,9 @@ class Matrix:
                 for j in range(obj1.columns):
                     result.data[i][j] = obj1.data[i][j] * obj2
             return result
-
         raise Exception("not a matrix or a scalar")
 
     def copy(self):
-        if isinstance(self, Vector):
-            raise Exception('this operation is forbidden for vectors')
         result = Matrix.zero_matrix(self.rows, self.columns)
         for i in range(self.rows):
             for j in range(self.columns):
@@ -103,13 +104,9 @@ class Matrix:
                     for i in range(len(self[0]))]
 
     def __minor(self, i: int, j: int):
-        if isinstance(self, Vector):
-            raise Exception('this operation is forbidden for vectors')
         return [row[:j] + row[j+1:] for row in (self[:i]+self[i+1:])]
 
     def determinant(self):
-        if isinstance(self, Vector):
-            raise Exception('this operation is forbidden for vectors')
         if isinstance(self, Matrix):
             matrix = self.data
         else:
@@ -127,8 +124,6 @@ class Matrix:
         raise Exception("not quadratic matrix")
 
     def inverse(self):
-        if isinstance(self, Vector):
-            raise Exception('this operation is forbidden for vectors')
         determinant = Matrix.determinant(self)
         if determinant != 0:
             if self.rows == 2:
@@ -152,8 +147,6 @@ class Matrix:
         raise Exception("degenerate matrix")
 
     def gram(self):
-        if isinstance(self, Vector):
-            raise Exception('this operation is forbidden for vectors')
         if self.rows == self.columns:
             result = Matrix.zero_matrix(self.rows, self.rows)
             for i in range(self.rows):
@@ -212,7 +205,7 @@ class Vector(Matrix):
     def __scalar_product(self, obj: 'Vector'):
         if isinstance(obj, Vector):
             return self[0]*obj[0] + self[1]*obj[1] + self[2]*obj[2]
-        raise Exception("not a vector")
+        raise TypeError("not a vector")
 
     def __vector_product(self, obj: 'Vector'):
         if self.size == 3 and obj.size == 3:
@@ -265,19 +258,59 @@ class Vector(Matrix):
     def len(self):
         return (self & self)**0.5
 
+    zero_matrix = restricted
+    identity_matrix = restricted
+    copy = restricted
+    __setitem__ = restricted
+    determinant = restricted
+    inverse = restricted
+    gram = restricted
+    
 
 def BilinearForm(matrix: Matrix, vec1: Vector, vec2: Vector):
-    sum = 0
-    for i in range(matrix.rows):
-        for j in range(matrix.columns):
-            sum += matrix[i][j]*vec1[i]*vec2[j]
-    return sum
+    if matrix.rows == matrix.columns and matrix.rows == vec1.size and \
+            matrix.rows == vec2.size:
+        sum = 0
+        for i in range(matrix.rows):
+            for j in range(matrix.rows):
+                sum += matrix[i][j]*vec1[i]*vec2[j]
+        return sum
+    raise Exception("wrong sizes")
 
 
 class Point(Vector):
-    def __add__(self, point1: 'Point'):
-        return
+    def __add__(self, vector: Vector):
+        if isinstance(vector, Vector):
+            if self.size == vector.size:
+                return Point([self.values[i]+vector.values[i] 
+                            for i in range(self.size)])
+            raise Exception("wrong sizes")
+        raise Exception("wrong usage of addition")
+    
+    def __radd__(self, vector: Vector):
+        if isinstance(vector, Vector):
+            if self.size == vector.size:
+                return Point([self.values[i]+vector.values[i] 
+                            for i in range(self.size)])
+            raise Exception("wrong sizes")
+        raise Exception("wrong usage of addition")
+    
+    def __sub__(self, vector: Vector):
+        if isinstance(vector, Vector):
+            if self.size == vector.size:
+                return Point([self.values[i]-vector.values[i] 
+                            for i in range(self.size)])
+            raise Exception("wrong sizes")
+        raise Exception("wrong usage of addition")
 
+    
+    __mul__ = restricted
+    __rmul__ = restricted
+    transpose = restricted
+    __and__ = restricted
+    __pow__ = restricted
+    len = restricted
+    
 
 class VectorSpace:
     def __init__(self, basis: list[Vector]):
@@ -290,6 +323,7 @@ class VectorSpace:
     def as_vector(self, point: Point):
         pass
 
+# проверить, что такое as_vector в видео
 
 class CoorinateSystem:
     pass

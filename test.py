@@ -12,10 +12,13 @@ v4 = Vector([[0], [0], [1]])
 
 vs = VectorSpace([Vector([1, 0, 0]), Vector([0, 1, 0]), Vector([0, 0, 1])])
 
+p1 = Point([1, 1, 1])
+
 zero = Matrix.zero_matrix(2, 5)
-print("zero", zero)
+print("zero = Matrix.zero_matrix(2, 5)", zero)
 
 i = Matrix.identity_matrix(2)
+print("i = Matrix.identity_matrix(2)", i)
 print("m1*i", m1*i)
 
 print("m1+m2", m1+m2)
@@ -75,3 +78,9 @@ print("v1.len()", v1.len())
 print("BilinearForm(m3, v1, v2)", BilinearForm(m3, v1, v2))
 
 print("vs.scalar_product(v3, v4)", vs.scalar_product(v3, v4))
+
+print("v1+p1", v1+p1)
+
+print("p1+v1", p1+v1)
+
+print("p1-v1", p1-v1)
