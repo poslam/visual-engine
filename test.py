@@ -47,9 +47,9 @@ print("m1.transpose()", m1.transpose())
 
 print("m3.determinant()", m3.determinant())
 
-print("m1.inverese()", m1.inverse())
-print("m1*m1.inverese()", m1*m1.inverse(),
-      "m1.inverese()*m1", m1.inverse()*m1)
+print("m1.inverse()", m1.inverse())
+print("m1*m1.inverse()", m1*m1.inverse(),
+      "m1.inverse()*m1", m1.inverse()*m1)
 
 print("m1.gram()", m1.gram())
 
