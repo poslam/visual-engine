@@ -69,10 +69,13 @@ class Matrix:
         if (isinstance(self, (Matrix, int, float))
                 and isinstance(obj, (Matrix, int, float))):
             return self.__product(self, obj)
+        raise TypeError("wrong usage of multiply")
 
     def __rmul__(self, obj: 'Matrix'):
-        if isinstance(self, Matrix) and isinstance(obj, Matrix):
+        if (isinstance(self, (Matrix, int, float))
+                and isinstance(obj, (Matrix, int, float))):
             return self.__product(self, obj)
+        raise TypeError("wrong usage of multiply")
 
     def __sub__(self, obj: 'Matrix'):
         if isinstance(obj, Matrix):
@@ -90,12 +93,6 @@ class Matrix:
         return f'{self.data}'
 
     def transpose(self):
-        if isinstance(self, Vector):
-            self = self.as_matrix
-            data = [[self[j][i] for j in range(self.rows)]
-                    for i in range(self.columns)]
-            self = Vector(data)
-            return self
         if isinstance(self, Matrix):
             data = [[self[j][i] for j in range(self.rows)]
                     for i in range(self.columns)]
@@ -105,7 +102,7 @@ class Matrix:
             return [[self[j][i] for j in range(len(self))]
                     for i in range(len(self[0]))]
 
-    def minor(self, i: int, j: int):
+    def __minor(self, i: int, j: int):
         if isinstance(self, Vector):
             raise Exception('this operation is forbidden for vectors')
         return [row[:j] + row[j+1:] for row in (self[:i]+self[i+1:])]
@@ -125,7 +122,7 @@ class Matrix:
             determinant = 0
             for c in range(len(matrix)):
                 determinant += ((-1)**c)*matrix[0][c] *\
-                    Matrix.determinant(Matrix.minor(matrix, 0, c))
+                    Matrix.determinant(Matrix.__minor(matrix, 0, c))
             return determinant
         raise Exception("not quadratic matrix")
 
@@ -142,9 +139,9 @@ class Matrix:
             for r in range(self.rows):
                 cofactorRow = []
                 for c in range(self.rows):
-                    minor = Matrix.minor(self, r, c)
+                    __minor = Matrix.__minor(self, r, c)
                     cofactorRow.append(((-1)**(r+c)) *
-                                       Matrix.determinant(minor))
+                                       Matrix.determinant(__minor))
                 cofactors.append(cofactorRow)
             cofactors = Matrix.transpose(cofactors)
             for r in range(len(cofactors)):
@@ -200,6 +197,13 @@ class Vector(Matrix):
 
         self.size = len(values)
 
+    def transpose(self):
+        self = self.as_matrix
+        data = [[self[j][i] for j in range(self.rows)]
+                for i in range(self.columns)]
+        self = Vector(data)
+        return self
+
     def __getitem__(self, key: int):
         if self.type == 'h':
             return self.values[key]
@@ -228,6 +232,7 @@ class Vector(Matrix):
                     return Vector(result)
                 return Vector(result[0])
             raise Exception("different sizes")
+        raise TypeError("wrong usage of addition")
 
     def __and__(self, obj: 'Vector'):
         return Vector.__scalar_product(self, obj)
@@ -271,7 +276,7 @@ def BilinearForm(matrix: Matrix, vec1: Vector, vec2: Vector):
 
 class Point(Vector):
     def __add__(self, point1: 'Point'):
-        return 
+        return
 
 
 class VectorSpace:
@@ -288,30 +293,3 @@ class VectorSpace:
 
 class CoorinateSystem:
     pass
-
-
-# matrix1 = Matrix([[1, 2],
-#                   [3, 4]])
-# matrix2 = Matrix([[1, 2],
-#                   [3, 3]])
-
-# vec1 = Vector([1, 2, 3])
-# vec2 = Vector([2, 3, 5])
-# vec3 = Vector([[1], [2], [3]])
-
-# x = Matrix.zero_matrix(2, 4)
-
-# print(matrix1)
-
-
-# matrix3 = matrix1.gram()
-# print(matrix3)
-
-# i = Matrix.identity_matrix(2)
-
-# x = matrix1.inverse()
-# # print(x.rows)
-
-# # matrix2 -= matrix1
-
-# print(matrix1*x)

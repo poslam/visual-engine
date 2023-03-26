@@ -34,7 +34,7 @@ print("m3.determinant()", m3.determinant())
 
 print("m1.inverese()", m1.inverse())
 print("m1*m1.inverese()", m1*m1.inverse(),
-      "m1.Inverese()*m1", m1.inverse()*m1)
+      "m1.inverese()*m1", m1.inverse()*m1)
 
 print("m1.gram()", m1.gram())
 
@@ -56,6 +56,10 @@ print("v1*2", v1*2)
 
 print("v1*2", v3*2)
 
+print("v1/2", v1/2)
+
+print("v3/2", v3/2)
+
 print("v1&v2", v1&v2)
 
 print("v1&v4", v1&v4)
@@ -70,4 +74,4 @@ print("v1.len()", v1.len())
 
 print("BilinearForm(m3, v1, v2)", BilinearForm(m3, v1, v2))
 
-print(vs.scalar_product(v3, v4))
+print("vs.scalar_product(v3, v4)", vs.scalar_product(v3, v4))
