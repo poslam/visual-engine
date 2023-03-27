@@ -45,7 +45,7 @@ class Matrix:
             raise Exception("different sizes")
         raise TypeError("wrong usage of addition")
 
-    def __product(self, obj1: Union['Matrix', float, int],
+    def __product(obj1: Union['Matrix', float, int],
                   obj2: Union['Matrix', float, int]):
         if isinstance(obj1, Matrix) and isinstance(obj2, Matrix):
             if obj1.columns == obj2.rows:
@@ -56,19 +56,14 @@ class Matrix:
             raise Exception("wrong sizes")
 
         elif isinstance(obj1, (float, int)) and isinstance(obj2, Matrix):
-            result = Matrix.zero_matrix(obj2.rows, obj2.columns)
+            result = obj2.copy()
             for i in range(obj2.rows):
                 for j in range(obj2.columns):
                     result.data[i][j] *= obj1
             return result
 
         elif isinstance(obj1, Matrix) and isinstance(obj2, (float, int)):
-            result = Matrix.zero_matrix(obj1.rows, obj1.columns)
-            for i in range(obj1.rows):
-                for j in range(obj1.columns):
-                    result.data[i][j] = obj1.data[i][j] * obj2
-            return result
-        raise Exception("not a matrix or a scalar")
+            return Matrix.__product(obj2, obj1)
 
     def copy(self):
         result = Matrix.zero_matrix(self.rows, self.columns)
@@ -80,13 +75,13 @@ class Matrix:
     def __mul__(self, obj: 'Matrix'):
         if (isinstance(self, (Matrix, int, float))
                 and isinstance(obj, (Matrix, int, float))):
-            return self.__product(self, obj)
+            return Matrix.__product(self, obj)
         raise TypeError("wrong usage of multiply")
 
     def __rmul__(self, obj: 'Matrix'):
         if (isinstance(self, (Matrix, int, float))
                 and isinstance(obj, (Matrix, int, float))):
-            return self.__product(self, obj)
+            return Matrix.__product(self, obj)
         raise TypeError("wrong usage of multiply")
 
     def __sub__(self, obj: 'Matrix'):
@@ -113,6 +108,7 @@ class Matrix:
         if isinstance(self, list):
             return [[self[j][i] for j in range(len(self))]
                     for i in range(len(self[0]))]
+        raise Exception("wrong usage of transpose()")
 
     def __minor(self, i: int, j: int):
         return [row[:j] + row[j+1:] for row in (self[:i]+self[i+1:])]
@@ -168,27 +164,15 @@ class Matrix:
             return result
         raise Exception("not a quadratic matrix")
 
-    # def gram(self):
-    #     if self.rows == self.columns:
-    #         result = Matrix.zero_matrix(self.rows, self.rows)
-    #         for i in range(self.rows):
-    #             for j in range(self.rows):
-    #                 sum = 0
-    #                 for k in range(self.columns):
-    #                     sum += self[i][k]*self[j][k]
-    #                 result[i][j] = sum
-    #         return result
-    #     raise Exception("not a quadratic matrix")
-
     def __truediv__(self, obj: Union['Matrix', int, float]):
-        if isinstance(obj, (int, float)):
+        if isinstance(self, Matrix) and isinstance(obj, (int, float)):
             return self * (1/obj)
-        if isinstance(obj, Matrix):
+        if isinstance(self, Matrix) and isinstance(obj, Matrix):
             return self * obj.inverse()
         raise TypeError("wrong usage of division")
 
     def __rtruediv__(self, obj):
-        raise Exception("not commutative")
+        raise Exception("division not commutative")
 
 
 class Vector(Matrix):
@@ -264,10 +248,10 @@ class Vector(Matrix):
     def __rmul__(self, obj: Union[int, float, 'Vector']):
         if isinstance(obj, Vector):
             result = self.as_matrix * obj.as_matrix
-            return result
+            return Vector(result)
         elif isinstance(obj, (int, float)):
             result = self.as_matrix * obj
-            return result
+            return Vector(result)
         raise Exception("wrong usage of multiply")
 
     def __pow__(self, obj: 'Vector'):
