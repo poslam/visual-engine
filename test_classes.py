@@ -37,4 +37,4 @@ class TestMatrixOperations:
         assert m3 == m5
         
     def test_eqation_of_matrices3(self):
-        assert m1 == m2
+        assert m1 != m2
