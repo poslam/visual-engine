@@ -2,13 +2,13 @@ from typing import Union
 
 
 @property
-def restricted(obj: str):
-    raise AttributeError(f'{obj.__class__} does not have this attribite')
+def restricted(self):
+    raise AttributeError(f'{self.__class__} does not have this attribite')
 
 
 class Matrix:
-    def __init__(self, data: Union[list[list[float]], 'Vector', 'Point']):
-        if isinstance(data, Point) or isinstance(data, Vector):
+    def __init__(self, data: Union[list[list[float]], 'Vector']):
+        if isinstance(data, Vector):
             data = [data.values]
         self.data = data
         self.rows = len(data)
@@ -24,9 +24,7 @@ class Matrix:
     def identity_matrix(size: int):
         result = Matrix.zero_matrix(size, size)
         for i in range(size):
-            for j in range(size):
-                if i == j:
-                    result.data[i][j] = 1
+            result.data[i][i] = 1
         return result
 
     def __eq__(self, obj: 'Matrix'):
@@ -157,24 +155,37 @@ class Matrix:
                     cofactors[r][c] = cofactors[r][c]/determinant
             result = Matrix(cofactors)
             return result
-        raise Exception("degenerate matrix")
+        raise Exception("singular matrix")
 
     def gram(self):
         if self.rows == self.columns:
             result = Matrix.zero_matrix(self.rows, self.rows)
+            identity = Matrix.identity_matrix(self.rows)
             for i in range(self.rows):
-                for j in range(self.rows):
-                    sum = 0
-                    for k in range(self.columns):
-                        sum += self[i][k]*self[j][k]
-                    result[i][j] = sum
+                for j in range(self.columns):
+                    result[i][j] = BilinearForm(
+                        identity, Vector(self[i]), Vector(self[j]))
             return result
         raise Exception("not a quadratic matrix")
 
-    def __truediv__(self, obj: Union[int, float]):
+    # def gram(self):
+    #     if self.rows == self.columns:
+    #         result = Matrix.zero_matrix(self.rows, self.rows)
+    #         for i in range(self.rows):
+    #             for j in range(self.rows):
+    #                 sum = 0
+    #                 for k in range(self.columns):
+    #                     sum += self[i][k]*self[j][k]
+    #                 result[i][j] = sum
+    #         return result
+    #     raise Exception("not a quadratic matrix")
+
+    def __truediv__(self, obj: Union['Matrix', int, float]):
         if isinstance(obj, (int, float)):
             return self * (1/obj)
-        raise Exception("not a scalar")
+        if isinstance(obj, Matrix):
+            return self * obj.inverse()
+        raise TypeError("wrong usage of division")
 
     def __rtruediv__(self, obj):
         raise Exception("not commutative")
@@ -189,19 +200,20 @@ class Vector(Matrix):
             if len(values[0]) == 1:
                 self.as_matrix = Matrix(values)
                 self.values = values
-                self.type = 'v'
+                self.is_transposed = True
+                self.size = len(values)
             elif len(values) == 1:
                 self.as_matrix = Matrix(values)
                 self.values = values[0]
-                self.type = 'h'
+                self.is_transposed = False
+                self.size = len(values[0])
             else:
-                raise Exception('wrong size for a vector')
+                raise Exception("wrong size for a vector")
         elif isinstance(values[0], (int, float)):
             self.as_matrix = Matrix([values])
             self.values = values
-            self.type = 'h'
-
-        self.size = len(values)
+            self.is_transposed = False
+            self.size = len(values)
 
     def transpose(self):
         self = self.as_matrix
@@ -211,13 +223,16 @@ class Vector(Matrix):
         return self
 
     def __getitem__(self, key: int):
-        if self.type == 'h':
+        if self.is_transposed == False:
             return self.values[key]
         return self.values[key][0]
 
     def __scalar_product(self, obj: 'Vector'):
         if isinstance(obj, Vector):
-            return self[0]*obj[0] + self[1]*obj[1] + self[2]*obj[2]
+            if self.size == obj.size:
+                identity = Matrix.identity_matrix(self.size)
+                return BilinearForm(identity, self, obj)
+            raise Exception("wrong sizes")
         raise TypeError("not a vector")
 
     def __vector_product(self, obj: 'Vector'):
@@ -225,18 +240,12 @@ class Vector(Matrix):
             return Vector([self[1]*obj[2] - self[2]*obj[1],
                            self[2]*obj[0] - self[0]*obj[2],
                            self[0]*obj[1] - self[1]*obj[0]])
+        raise Exception("wrong dimension")
 
     def __add__(self, obj: 'Vector'):
         if isinstance(self, Vector) and isinstance(obj, Vector):
-            self, obj = self.as_matrix, obj.as_matrix
-            result = Matrix.zero_matrix(self.rows, self.columns)
-            if self.rows == obj.rows and self.columns == obj.columns:
-                result.data = [[self.data[row][column] + obj.data[row][column]
-                                for column in range(self.columns)]
-                               for row in range(self.rows)]
-                if len(result.data[0]) == 1:
-                    return Vector(result)
-                return Vector(result[0])
+            if self.size == obj.size:
+                return Vector([self[i]+obj[i] for i in range(self.size)])
             raise Exception("different sizes")
         raise TypeError("wrong usage of addition")
 
@@ -250,6 +259,7 @@ class Vector(Matrix):
         elif isinstance(obj, (int, float)):
             result = self.as_matrix * obj
             return Vector(result)
+        raise Exception("wrong usage of multiply")
 
     def __rmul__(self, obj: Union[int, float, 'Vector']):
         if isinstance(obj, Vector):
@@ -258,6 +268,7 @@ class Vector(Matrix):
         elif isinstance(obj, (int, float)):
             result = self.as_matrix * obj
             return result
+        raise Exception("wrong usage of multiply")
 
     def __pow__(self, obj: 'Vector'):
         return Vector.__vector_product(self, obj)
@@ -333,14 +344,15 @@ class VectorSpace:
         self.size = len(basis)
 
     def scalar_product(self, vec1: 'Vector', vec2: 'Vector'):
-        if vec1.type == 'v' and vec2.type == 'v':
-            return (vec1.transpose().as_matrix*Matrix.gram(self.basis)*vec2.as_matrix)[0][0]
-        elif vec1.type == 'h' and vec2.type == 'h':
+        if vec1.is_transposed == False and vec2.is_transposed == False:
             return (vec1.as_matrix*Matrix.gram(self.basis)*vec2.transpose().as_matrix)[0][0]
-        elif vec1.type == 'v' and vec2.type == 'h':
-            return (vec1.transpose().as_matrix*Matrix.gram(self.basis)*vec2.transpose().as_matrix)[0][0]
-        elif vec1.type == 'h' and vec2.type == 'v':
+        elif vec1.is_transposed == False and vec2.is_transposed:
             return (vec1.as_matrix*Matrix.gram(self.basis)*vec2.as_matrix)[0][0]
+        elif vec1.is_transposed and vec2.is_transposed:
+            return (vec1.transpose().as_matrix*Matrix.gram(self.basis)*vec2.as_matrix)[0][0]
+        elif vec1.is_transposed and vec2.is_transposed == False:
+            return (vec1.transpose().as_matrix*Matrix.gram(self.basis)*vec2.transpose().as_matrix)[0][0]
+        raise Exception("wrong usage of scalar_product")
 
     def as_vector(self, point: Point):
         if point.size == self.size:

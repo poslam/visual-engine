@@ -55,6 +55,8 @@ print("m1.inverse()", m1.inverse())
 print("m1*m1.inverse()", m1*m1.inverse(),
       "m1.inverse()*m1", m1.inverse()*m1)
 
+print("m1/m2", m1/m2)
+
 print("m1.gram()", m1.gram())
 
 print("m1/2", m1/2)
