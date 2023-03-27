@@ -16,7 +16,8 @@ p1 = Point([1, 1, 1])
 
 print("m1", m1)
 print("m2", m2)
-print("m3", m3, '\n')
+print("m3", m3)
+print("m4", m4, '\n')
 
 print("v1", v1)
 print("v2", v2)
