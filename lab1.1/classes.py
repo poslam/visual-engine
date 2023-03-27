@@ -29,6 +29,13 @@ class Matrix:
                     result.data[i][j] = 1
         return result
 
+    def __eq__(self, obj: 'Matrix'):
+        if self.rows == obj.rows and self.columns == obj.columns:
+            eps = 10**(-7)
+            if all(abs(self[i][j] - obj[i][j]) < eps for i in range(self.rows) for j in range(self.columns)):
+                return True
+        return False
+
     def __add__(self, obj: 'Matrix'):
         if isinstance(obj, Matrix):
             result = Matrix.zero_matrix(self.rows, self.columns)
@@ -260,6 +267,9 @@ class Vector(Matrix):
 
     def __repr__(self):
         return f'{self.values}'
+
+    def __eq__(self, obj: 'Vector'):
+        return self.as_matrix == obj.as_matrix
 
     def len(self):
         return (self & self)**0.5

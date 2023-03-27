@@ -3,6 +3,7 @@ from classes import *
 m1 = Matrix([[1, 2], [3, 4]])
 m2 = Matrix([[2, 3], [1, 0]])
 m3 = Matrix([[1, 2, 3], [2, 3, 1], [5, 1, 0]])
+m4 = Matrix([[1+10**(-5), 2, 3], [2, 3, 1], [5, 1, 0]])
 
 v1 = Vector([1, 2, 3])
 v2 = Vector([5, 6, 0])
@@ -42,6 +43,8 @@ print("m1*m2", m1*m2)
 print("m2-m1", m2-m1)
 
 print("m1*3", m1*3, "3*m1", 3*m1)
+
+print("m3 == m4", m3 == m4)
 
 print("m1.transpose()", m1.transpose())
 
