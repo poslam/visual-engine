@@ -101,9 +101,9 @@ class Matrix:
 
     def transpose(self):
         if isinstance(self, Matrix):
-            data = [[self[j][i] for j in range(self.rows)]
+            self.data = [[self[j][i] for j in range(self.rows)]
                     for i in range(self.columns)]
-            self = Matrix(data)
+            self.rows, self.columns = self.columns, self.rows
             return self
         if isinstance(self, list):
             return [[self[j][i] for j in range(len(self))]
@@ -200,10 +200,10 @@ class Vector(Matrix):
             self.size = len(values)
 
     def transpose(self):
-        self = self.as_matrix
-        data = [[self[j][i] for j in range(self.rows)]
-                for i in range(self.columns)]
-        self = Vector(data)
+        temp = Vector(self.as_matrix.transpose())
+        self.values = temp.values
+        self.as_matrix = temp.as_matrix
+        self.is_transposed = not(self.is_transposed)
         return self
 
     def __getitem__(self, key: int):
@@ -225,11 +225,11 @@ class Vector(Matrix):
                            self[2]*obj[0] - self[0]*obj[2],
                            self[0]*obj[1] - self[1]*obj[0]])
         raise Exception("wrong dimension")
-
+    
     def __add__(self, obj: 'Vector'):
         if isinstance(self, Vector) and isinstance(obj, Vector):
             if self.size == obj.size:
-                return Vector([self[i]+obj[i] for i in range(self.size)])
+                return Vector((self.as_matrix+obj.as_matrix).data)
             raise Exception("different sizes")
         raise TypeError("wrong usage of addition")
 

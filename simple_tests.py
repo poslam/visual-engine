@@ -55,7 +55,7 @@ print("m1.inverse()", m1.inverse())
 print("m1*m1.inverse()", m1*m1.inverse(),
       "m1.inverse()*m1", m1.inverse()*m1)
 
-print("m1/m2", m1/m2)
+print("m1/m2", m1/m2, "(m1/m2)*m2", (m1/m2)*m2)
 
 print("m1.gram()", m1.gram())
 
@@ -65,9 +65,9 @@ print("v1.transpose()", v1.transpose())
 
 print("v3.transpose()", v3.transpose())
 
-print("v1+v2", v1+v2)
+print("v1+v2", v1.transpose()+v2)
 
-print("v3+v4", v3+v4)
+print("v3+v4", v3.transpose()+v4)
 
 print("v2-v1", v2-v1)
 
@@ -104,12 +104,3 @@ print("p1+v1", p1+v1)
 print("p1-v1", p1-v1)
 
 print("vs.as_vector(p1)", vs.as_vector(p1))
-
-'''
-1. Поправил Matrix.__product (упростил третий if)
-2. Сделал вычисление матрицы Грэма с помощью биллинеарной формы
-3. Сделал деление матрицы1 на матрицу2 (матрица1 умножается на обратную матрицу2)
-4. Сменил vector.type на vector.is_transposed() (выдает bool)
-5. Переделал сложение векторов
-6. Сделал скалярное произведение через биллинеарную форму
-'''
