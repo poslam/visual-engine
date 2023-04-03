@@ -1,5 +1,18 @@
 from typing import Union
 
+# class EngineExceptions(Exception):
+#     def __init__(self):
+#         pass
+        
+#     # def MatrixDeletionError(self):
+#     #     return "xyz"
+    
+#     def __str__(self):
+#         return ("xyz")
+        
+# if (True):
+#     raise EngineExceptions
+
 
 @property
 def restricted(self):
@@ -78,11 +91,7 @@ class Matrix:
             return Matrix.__product(self, obj)
         raise TypeError("wrong usage of multiply")
 
-    def __rmul__(self, obj: 'Matrix'):
-        if (isinstance(self, (Matrix, int, float))
-                and isinstance(obj, (Matrix, int, float))):
-            return Matrix.__product(self, obj)
-        raise TypeError("wrong usage of multiply")
+    __rmul__ = __mul__
 
     def __sub__(self, obj: 'Matrix'):
         if isinstance(obj, Matrix):
@@ -245,15 +254,8 @@ class Vector(Matrix):
             return Vector(result)
         raise Exception("wrong usage of multiply")
 
-    def __rmul__(self, obj: Union[int, float, 'Vector']):
-        if isinstance(obj, Vector):
-            result = self.as_matrix * obj.as_matrix
-            return Vector(result)
-        elif isinstance(obj, (int, float)):
-            result = self.as_matrix * obj
-            return Vector(result)
-        raise Exception("wrong usage of multiply")
-
+    __rmul__ = __mul__
+    
     def __pow__(self, obj: 'Vector'):
         return Vector.__vector_product(self, obj)
 
@@ -268,7 +270,7 @@ class Vector(Matrix):
 
     def len(self):
         return (self & self)**0.5
-
+ 
     zero_matrix = restricted
     identity_matrix = restricted
     copy = restricted
@@ -298,13 +300,7 @@ class Point(Vector):
             raise Exception("wrong sizes")
         raise Exception("wrong usage of addition")
 
-    def __radd__(self, vector: Vector):
-        if isinstance(vector, Vector):
-            if self.size == vector.size:
-                return Point([self.values[i]+vector.values[i]
-                              for i in range(self.size)])
-            raise Exception("wrong sizes")
-        raise Exception("wrong usage of addition")
+    __radd__ = __add__
 
     def __sub__(self, vector: Vector):
         if isinstance(vector, Vector):
