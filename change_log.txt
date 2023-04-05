@@ -1,0 +1,4 @@
+lab2:
+
+1. added custom exceptions (past were rewritten)
+2. 
