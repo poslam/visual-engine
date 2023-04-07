@@ -1,4 +1,4 @@
 lab2:
 
-1. added custom exceptions (past were rewritten)
-2. 
+1. class EngineException
+2. вертикальный вектор теперь может быть сложен с горизонтальным (вывод: горизонтальный вектор)
