@@ -1,5 +1,6 @@
 from typing import Union
-from classes.exceptions import EngineException
+from classes.exceptions import EngineException, MatrixException
+from math import pi, cos, sin
 
 
 @property
@@ -16,7 +17,7 @@ class Matrix:
         self.columns = len(data[0])
         for i in range(self.rows-1):
             if len(self.data[i]) != len(self.data[i+1]):
-                raise EngineException(EngineException.RECTANGULAR_MATRIX)  
+                raise MatrixException(MatrixException.RECTANGULAR_MATRIX)
 
     def zero_matrix(rows: int, columns: int):
         data = [[0 for j in range(columns)] for i in range(rows)]
@@ -43,7 +44,7 @@ class Matrix:
                                 for column in range(self.columns)]
                                for row in range(self.rows)]
                 return result
-            raise EngineException(EngineException.WRONG_SIZES)
+            raise EngineException(EngineException.WRONG_SIZE)
         raise EngineException(EngineException.WRONG_USAGE)
 
     def __product(obj1: Union['Matrix', float, int],
@@ -125,7 +126,7 @@ class Matrix:
                 determinant += ((-1)**c)*matrix[0][c] *\
                     Matrix.determinant(Matrix.__minor(matrix, 0, c))
             return determinant
-        raise EngineException(EngineException.QUADRATIC_MATRIX)
+        raise MatrixException(MatrixException.QUADRATIC_MATRIX)
 
     def inverse(self):
         determinant = Matrix.determinant(self)
@@ -148,7 +149,7 @@ class Matrix:
                     cofactors[r][c] = cofactors[r][c]/determinant
             result = Matrix(cofactors)
             return result
-        raise EngineException(EngineException.SINGULAR_MATRIX)
+        raise MatrixException(MatrixException.SINGULAR_MATRIX)
 
     def gram(self):
         if self.rows == self.columns:
@@ -159,7 +160,7 @@ class Matrix:
                     result[i][j] = BilinearForm(
                         identity, Vector(self[i]), Vector(self[j]))
             return result
-        raise EngineException(EngineException.QUADRATIC_MATRIX)
+        raise MatrixException(MatrixException.QUADRATIC_MATRIX)
 
     def __truediv__(self, obj: Union['Matrix', int, float]):
         if isinstance(self, Matrix) and isinstance(obj, (int, float)):
@@ -171,12 +172,43 @@ class Matrix:
     def __rtruediv__(self, obj):
         raise EngineException(EngineException.WRONG_USAGE)
 
+    def rotate_2D(self, angle: float):
+        '''
+        angle in degrees
+        '''
+        angle = angle*pi/180
+        if self.columns == 2:
+            rotation_matrix = Matrix([[cos(angle), -sin(angle)],
+                                      [sin(angle), cos(angle)]])
+            self.data = (self * rotation_matrix).data
+            return self
+        raise EngineException(EngineException.DIMENSION_ERROR(2))
+
+    def rotate_3D(self, angle_x: float, angle_y: float, angle_z: float):
+        '''
+        angles in degrees
+        '''
+        angle_x, angle_y, angle_z = angle_x*pi/180, angle_y*pi/180, angle_z*pi/180
+        if self.columns == 3:
+            rotation_matrix_x = Matrix([[1, 0, 0],
+                                        [0, cos(angle_x), -sin(angle_x)],
+                                        [0, sin(angle_x), cos(angle_x)]])
+            rotation_matrix_y = Matrix([[cos(angle_y), 0, sin(angle_y)],
+                                        [0, 1, 0],
+                                        [-sin(angle_y), 0, cos(angle_y)]])
+            rotation_matrix_z = Matrix([[cos(angle_z), -sin(angle_z), 0],
+                                        [sin(angle_z), cos(angle_z), 0],
+                                        [0, 0, 1]])
+            self.data = (self * rotation_matrix_x *
+                         rotation_matrix_y * rotation_matrix_z)
+            return self
+        raise EngineException(EngineException.DIMENSION_ERROR(3))
+
 
 class Vector(Matrix):
     def __init__(self, values: Union[list[list[float]], Matrix]):
         if isinstance(values, Matrix):
             values = values.data
-
         if isinstance(values[0], list):
             if len(values[0]) == 1:
                 self.as_matrix = Matrix(values)
@@ -212,7 +244,7 @@ class Vector(Matrix):
         if self.size == obj.size:
             identity = Matrix.identity_matrix(self.size)
             return BilinearForm(identity, self, obj)
-        raise EngineException(EngineException.WRONG_SIZES)
+        raise EngineException(EngineException.WRONG_SIZE)
 
     def __vector_product(self, obj: 'Vector'):
         if self.size == 3 and obj.size == 3:
@@ -231,7 +263,7 @@ class Vector(Matrix):
                 elif self.is_transposed == False and obj.is_transposed == True:
                     return Vector((self.as_matrix+obj.transpose().as_matrix).data)
                 return Vector((self.as_matrix+obj.as_matrix).data).transpose()
-            raise EngineException(EngineException.WRONG_SIZES)
+            raise EngineException(EngineException.WRONG_SIZE)
         raise EngineException(EngineException.WRONG_USAGE)
 
     def __and__(self, obj: 'Vector'):
@@ -263,6 +295,22 @@ class Vector(Matrix):
     def len(self):
         return (self & self)**0.5
 
+    def rotate_2D(self, angle: float):
+        '''
+        angle in degrees
+        '''
+        if self.is_transposed == True:
+            return Vector(self.transpose().as_matrix.rotate_2D(angle)).transpose()
+        return Vector(self.as_matrix.rotate_2D(angle))
+
+    def rotate_3D(self, angle_x: float, angle_y: float, angle_z: float):
+        '''
+        angles in degrees
+        '''
+        if self.is_transposed == True:
+            return Vector(self.transpose().as_matrix.rotate_3D(angle_x, angle_y, angle_z)).transpose()
+        return Vector(self.as_matrix.rotate_3D(angle_x, angle_y, angle_z))
+
     zero_matrix = restricted
     identity_matrix = restricted
     copy = restricted
@@ -280,7 +328,7 @@ def BilinearForm(matrix: Matrix, vec1: Vector, vec2: Vector):
             for j in range(matrix.rows):
                 sum += matrix[i][j]*vec1[i]*vec2[j]
         return sum
-    raise EngineException(EngineException.WRONG_SIZES)
+    raise EngineException(EngineException.WRONG_SIZE)
 
 
 class Point(Vector):
@@ -289,7 +337,7 @@ class Point(Vector):
             if self.size == vector.size:
                 return Point([self.values[i]+vector.values[i]
                               for i in range(self.size)])
-            raise EngineException(EngineException.WRONG_SIZES)
+            raise EngineException(EngineException.WRONG_SIZE)
         raise EngineException(EngineException.WRONG_USAGE)
 
     __radd__ = __add__
@@ -299,7 +347,7 @@ class Point(Vector):
             if self.size == vector.size:
                 return Point([self.values[i]-vector.values[i]
                               for i in range(self.size)])
-            raise EngineException(EngineException.WRONG_SIZES)
+            raise EngineException(EngineException.WRONG_SIZE)
         raise EngineException(EngineException.WRONG_USAGE)
 
     __mul__ = restricted
@@ -336,7 +384,7 @@ class VectorSpace:
                     temp_matrix[row][column] = point[row]
                 result[0][column] = temp_matrix.determinant() / det
             return Vector(result)
-        raise EngineException(EngineException.WRONG_SIZES)
+        raise EngineException(EngineException.WRONG_SIZE)
 
 
 class CoorinateSystem:
