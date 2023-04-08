@@ -1,6 +1,8 @@
+from math import cos, pi, sin
 from typing import Union
-from classes.exceptions import EngineException, MatrixException
-from math import pi, cos, sin
+
+import src.globals
+from src.exceptions import EngineException, MatrixException
 
 
 @property
@@ -172,37 +174,40 @@ class Matrix:
     def __rtruediv__(self, obj):
         raise EngineException(EngineException.WRONG_USAGE)
 
-    def rotate_2D(self, angle: float):
+    def rotate(self, angles: list[float]):
         '''
-        angle in degrees
+        angles in degrees
         '''
-        angle = angle*pi/180
         if self.columns == 2:
+            angle = angles[0]*pi/180
             rotation_matrix = Matrix([[cos(angle), -sin(angle)],
                                       [sin(angle), cos(angle)]])
             self.data = (self * rotation_matrix).data
             return self
-        raise EngineException(EngineException.DIMENSION_ERROR(2))
-
-    def rotate_3D(self, angle_x: float, angle_y: float, angle_z: float):
-        '''
-        angles in degrees
-        '''
-        angle_x, angle_y, angle_z = angle_x*pi/180, angle_y*pi/180, angle_z*pi/180
+        
         if self.columns == 3:
+            angle_x, angle_y, angle_z = angles[0]*pi/180, angles[1]*pi/180, angles[2]*pi/180
             rotation_matrix_x = Matrix([[1, 0, 0],
                                         [0, cos(angle_x), -sin(angle_x)],
                                         [0, sin(angle_x), cos(angle_x)]])
-            rotation_matrix_y = Matrix([[cos(angle_y), 0, sin(angle_y)],
-                                        [0, 1, 0],
-                                        [-sin(angle_y), 0, cos(angle_y)]])
+            if globals.vs_space.triplet_left == False:
+                rotation_matrix_y = Matrix([[cos(angle_y), 0, -sin(angle_y)],
+                                            [0, 1, 0],
+                                            [sin(angle_y), 0, cos(angle_y)]])
+            else:
+                rotation_matrix_y = Matrix([[cos(angle_y), 0, sin(angle_y)],
+                                            [0, 1, 0],
+                                            [-sin(angle_y), 0, cos(angle_y)]])
             rotation_matrix_z = Matrix([[cos(angle_z), -sin(angle_z), 0],
                                         [sin(angle_z), cos(angle_z), 0],
                                         [0, 0, 1]])
             self.data = (self * rotation_matrix_x *
-                         rotation_matrix_y * rotation_matrix_z)
+                         rotation_matrix_y * rotation_matrix_z).data
             return self
-        raise EngineException(EngineException.DIMENSION_ERROR(3))
+        
+        else:
+            pass
+        
 
 
 class Vector(Matrix):
@@ -362,6 +367,12 @@ class VectorSpace:
     def __init__(self, basis: list[Vector]):
         self.basis = Matrix([vec.values for vec in basis])
         self.size = len(basis)
+        temp = basis[0]**basis[1]
+        if temp&basis[2] / (temp.len()*basis[2].len()) == 1:
+            self.triplet_left = False
+        else:
+            self.triplet_left = True
+        
 
     def scalar_product(self, vec1: 'Vector', vec2: 'Vector'):
         if vec1.is_transposed == False and vec2.is_transposed == False:
