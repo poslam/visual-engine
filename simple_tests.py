@@ -105,8 +105,10 @@ p1 = Point([1, 1, 1])
 
 # print("p1+v1", p1+v1)
 
-print("p1-v1", p1-v1)
+# print("p1-v1", p1-v1)
 
 # print("vs.as_vector(p1)", vs.as_vector(p1))
 
-# v1.rotate_3D(20, 20, 20) -> [2.562931016507188, 2.1590801003123703, 1.6642589116662594]
+# print("v1.rotate([1, 2], 20).rotate([0, 2], 20).rotate([0, 1], 20)", v1.rotate([1, 2], 20).rotate([0, 2], 20).rotate([0, 1], 20))
+
+print(v3.rotate([1, 2], 90))

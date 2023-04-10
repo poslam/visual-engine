@@ -1,7 +1,6 @@
 from math import cos, pi, sin
 from typing import Union
 
-import src.globals
 from src.exceptions import EngineException, MatrixException
 
 
@@ -57,7 +56,7 @@ class Matrix:
                            for B_col in zip(*obj2.data)]
                           for A_row in obj1.data]
                 return Matrix(result)
-            raise EngineException(EngineException.WRONG_USAGE)
+            raise EngineException(EngineException.WRONG_SIZE)
 
         elif isinstance(obj1, (float, int)) and isinstance(obj2, Matrix):
             result = obj2.copy()
@@ -68,6 +67,9 @@ class Matrix:
 
         elif isinstance(obj1, Matrix) and isinstance(obj2, (float, int)):
             return Matrix.__product(obj2, obj1)
+        
+        else:
+            raise EngineException(EngineException.WRONG_USAGE)
 
     def copy(self):
         result = Matrix.zero_matrix(self.rows, self.columns)
@@ -77,17 +79,12 @@ class Matrix:
         return result
 
     def __mul__(self, obj: 'Matrix'):
-        if (isinstance(self, (Matrix, int, float))
-                and isinstance(obj, (Matrix, int, float))):
-            return Matrix.__product(self, obj)
-        raise EngineException(EngineException.WRONG_USAGE)
+        return Matrix.__product(self, obj)
 
     __rmul__ = __mul__
 
     def __sub__(self, obj: 'Matrix'):
-        if isinstance(obj, Matrix):
-            return self + (obj*(-1))
-        raise EngineException(EngineException.WRONG_USAGE)
+        return self + (obj*(-1))
 
     def __getitem__(self, key: int):
         return self.data[key]
@@ -173,41 +170,25 @@ class Matrix:
 
     def __rtruediv__(self, obj):
         raise EngineException(EngineException.WRONG_USAGE)
-
-    def rotate(self, angles: list[float]):
-        '''
-        angles in degrees
-        '''
-        if self.columns == 2:
-            angle = angles[0]*pi/180
-            rotation_matrix = Matrix([[cos(angle), -sin(angle)],
-                                      [sin(angle), cos(angle)]])
-            self.data = (self * rotation_matrix).data
-            return self
+    
+    def rotate (self, axes_indecies: list[int], angle: float):
+        angle = angle*pi/180
         
-        if self.columns == 3:
-            angle_x, angle_y, angle_z = angles[0]*pi/180, angles[1]*pi/180, angles[2]*pi/180
-            rotation_matrix_x = Matrix([[1, 0, 0],
-                                        [0, cos(angle_x), -sin(angle_x)],
-                                        [0, sin(angle_x), cos(angle_x)]])
-            if globals.vs_space.triplet_left == False:
-                rotation_matrix_y = Matrix([[cos(angle_y), 0, -sin(angle_y)],
-                                            [0, 1, 0],
-                                            [sin(angle_y), 0, cos(angle_y)]])
-            else:
-                rotation_matrix_y = Matrix([[cos(angle_y), 0, sin(angle_y)],
-                                            [0, 1, 0],
-                                            [-sin(angle_y), 0, cos(angle_y)]])
-            rotation_matrix_z = Matrix([[cos(angle_z), -sin(angle_z), 0],
-                                        [sin(angle_z), cos(angle_z), 0],
-                                        [0, 0, 1]])
-            self.data = (self * rotation_matrix_x *
-                         rotation_matrix_y * rotation_matrix_z).data
-            return self
+        rotation_matrix = Matrix.identity_matrix(self.columns)
         
+        rotation_matrix[axes_indecies[0]][axes_indecies[0]] = cos(angle)
+        rotation_matrix[axes_indecies[1]][axes_indecies[1]] = cos(angle)
+        
+        if axes_indecies[0] + axes_indecies[1] % 2 == 0:
+            rotation_matrix[axes_indecies[1]][axes_indecies[0]] = -sin(angle)
+            rotation_matrix[axes_indecies[0]][axes_indecies[1]] = sin(angle)
+            
         else:
-            pass
-        
+            rotation_matrix[axes_indecies[1]][axes_indecies[0]] = sin(angle)
+            rotation_matrix[axes_indecies[0]][axes_indecies[1]] = -sin(angle)
+            
+        self.data = (self * rotation_matrix).data
+        return self
 
 
 class Vector(Matrix):
@@ -299,22 +280,15 @@ class Vector(Matrix):
 
     def len(self):
         return (self & self)**0.5
-
-    def rotate_2D(self, angle: float):
-        '''
-        angle in degrees
-        '''
-        if self.is_transposed == True:
-            return Vector(self.transpose().as_matrix.rotate_2D(angle)).transpose()
-        return Vector(self.as_matrix.rotate_2D(angle))
-
-    def rotate_3D(self, angle_x: float, angle_y: float, angle_z: float):
-        '''
-        angles in degrees
-        '''
-        if self.is_transposed == True:
-            return Vector(self.transpose().as_matrix.rotate_3D(angle_x, angle_y, angle_z)).transpose()
-        return Vector(self.as_matrix.rotate_3D(angle_x, angle_y, angle_z))
+    
+    ### new
+    
+    def rotate (self, axes_indecies: list[int], angle: float):
+        if self.is_transposed == False:
+            self.values = self.as_matrix.rotate(axes_indecies, angle).data[0]
+            return self
+        self.values = self.transpose().as_matrix.rotate(axes_indecies, angle).transpose().data
+        return self
 
     zero_matrix = restricted
     identity_matrix = restricted
@@ -364,6 +338,9 @@ class Point(Vector):
 
 
 class VectorSpace:
+    
+    ### new
+    
     def __init__(self, basis: list[Vector]):
         self.basis = Matrix([vec.values for vec in basis])
         self.size = len(basis)
@@ -373,7 +350,6 @@ class VectorSpace:
         else:
             self.triplet_left = True
         
-
     def scalar_product(self, vec1: 'Vector', vec2: 'Vector'):
         if vec1.is_transposed == False and vec2.is_transposed == False:
             return (vec1.as_matrix*Matrix.gram(self.basis)*vec2.transpose().as_matrix)[0][0]
