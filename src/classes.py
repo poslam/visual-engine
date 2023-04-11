@@ -180,13 +180,9 @@ class Matrix:
         rotation_matrix[axes_indecies[0]][axes_indecies[0]] = cos(angle)
         rotation_matrix[axes_indecies[1]][axes_indecies[1]] = cos(angle)
         
-        if axes_indecies[0] + axes_indecies[1] % 2 == 0:
-            rotation_matrix[axes_indecies[1]][axes_indecies[0]] = -sin(angle)
-            rotation_matrix[axes_indecies[0]][axes_indecies[1]] = sin(angle)
-            
-        else:
-            rotation_matrix[axes_indecies[1]][axes_indecies[0]] = sin(angle)
-            rotation_matrix[axes_indecies[0]][axes_indecies[1]] = -sin(angle)
+        n = axes_indecies[0] + axes_indecies[1] % 2 == 0
+        rotation_matrix[axes_indecies[1]][axes_indecies[0]] = (-1)**(n+1) * sin(angle)
+        rotation_matrix[axes_indecies[0]][axes_indecies[1]] = (-1)**n * sin(angle)
             
         self.data = (self * rotation_matrix).data
         return self
