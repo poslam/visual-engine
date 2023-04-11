@@ -8,8 +8,6 @@ sys.path.append(os.path.dirname(SCRIPT_DIR))
 
 from src.classes import *
 
-m1 = Matrix([[1, 2], [3, 4]])
-m2 = Matrix([[2, 3], [1, 0]])
 m3 = Matrix([[1, 2, 3], [2, 3, 1], [5, 1, 0]])
 
 v1 = Vector([1, 2, 3])
@@ -24,6 +22,7 @@ p1 = Point([1, 1, 1])
 
 class TestMatrix:
     def testInitialize(self):
+        m1 = Matrix([[1, 2], [3, 4]])
         assert isinstance(m1, Matrix)
         
     def testExceptionRectangularMatrixInInit(self):
@@ -31,6 +30,7 @@ class TestMatrix:
             Matrix([[1, 2], [3]])
 
     def testDataIsList(self):
+        m1 = Matrix([[1, 2], [3, 4]])
         assert isinstance(m1.data, list)
 
     def testSizeAutoComplete(self):
@@ -49,9 +49,11 @@ class TestMatrix:
 
     def testIdentityMatrixByProduct(self):
         i = Matrix.identity_matrix(2)
+        m1 = Matrix([[1, 2], [3, 4]])
         assert m1*i == i*m1 == m1
 
     def testTransposeByDoubleTranspose(self):
+        m1 = Matrix([[1, 2], [3, 4]])
         assert m1.transpose().transpose() == m1
 
     def testEquationBySameMatrices(self):
@@ -63,6 +65,8 @@ class TestMatrix:
         assert m3 != m
 
     def testEquationByDifferentMatrices(self):
+        m1 = Matrix([[1, 2], [3, 4]])
+        m2 = Matrix([[2, 3], [1, 0]])
         assert m1 != m2
 
     def testIdentityMatrix(self):
@@ -76,34 +80,46 @@ class TestMatrix:
         assert m3 + m7 == m8
 
     def testAdditionOutType(self):
+        m1 = Matrix([[1, 2], [3, 4]])
+        m2 = Matrix([[2, 3], [1, 0]])
         assert isinstance(m1+m2, Matrix)
     
     def testCommutativeOfAddition(self):
+        m1 = Matrix([[1, 2], [3, 4]])
+        m2 = Matrix([[2, 3], [1, 0]])
         assert m1+m2 == m2+m1
         
     def testAdditionExceptionWrongSize(self):
         with pytest.raises(EngineException):
+            m1 = Matrix([[1, 2], [3, 4]])
             m1+m3
         
     def testAdditionExceptionWrongUsage(self):
         with pytest.raises(EngineException):
+            m1 = Matrix([[1, 2], [3, 4]])
             m1+3
             
     def testCopy(self):
+        m1 = Matrix([[1, 2], [3, 4]])
         assert m1 == m1.copy()
 
     def testProductExceptionWrongSize(self):
         with pytest.raises(EngineException):
+            m1 = Matrix([[1, 2], [3, 4]])
             m1*m3
             
     def testProductExceptionWrongUsage(self):
         with pytest.raises(EngineException):
+            m1 = Matrix([[1, 2], [3, 4]])
             m1*"str"
             
     def testProductOutType(self):
+        m1 = Matrix([[1, 2], [3, 4]])
+        m2 = Matrix([[2, 3], [1, 0]])
         assert isinstance(m1*m2, Matrix)
         
     def testProductWithScalarOutType(self):
+        m1 = Matrix([[1, 2], [3, 4]])
         assert isinstance(m1*4, Matrix)        
             
     def testProductMatrices(self):
@@ -120,5 +136,22 @@ class TestMatrix:
         assert m3*4 == 4*m3
         
     def testSubtraction(self):
+        m1 = Matrix([[1, 2], [3, 4]])
+        m2 = Matrix([[2, 3], [1, 0]])
         m3 = Matrix([[-1, -1], [2, 4]])
         assert m1-m2 == m3
+        
+    def testTranspose(self):
+        m1 = Matrix([[1, 2, 3], [5, 1, 7], [1, 3, 5]])
+        m2 = Matrix([[1, 5, 1], [2, 1, 3], [3, 7, 5]])
+        assert m1.transpose() == m2
+        
+    def testDeterminant(self):
+        m = Matrix([[4, 5, 7], [1, 7, 3], [9, 4, 1]])
+        assert m.determinant() == -303
+        
+    def testInverse(self):
+        m1 = Matrix([[1, 2], [3, 4]])
+        m2 = Matrix([[2, 3], [1, 0]])
+        assert m1 * m1.copy().inverse() == Matrix.identity_matrix(2) and \
+            m2.copy().inverse() * m2 == Matrix.identity_matrix(2)

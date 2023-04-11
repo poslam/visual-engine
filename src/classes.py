@@ -131,8 +131,9 @@ class Matrix:
         determinant = Matrix.determinant(self)
         if determinant != 0:
             if self.rows == 2:
-                return Matrix([[self[1][1]/determinant, -1*self[0][1]/determinant],
-                               [-1*self[1][0]/determinant, self[0][0]/determinant]])
+                self.data = [[self[1][1]/determinant, -1*self[0][1]/determinant],
+                               [-1*self[1][0]/determinant, self[0][0]/determinant]]
+                return self
 
             cofactors = []
             for r in range(self.rows):
@@ -146,8 +147,8 @@ class Matrix:
             for r in range(len(cofactors)):
                 for c in range(len(cofactors)):
                     cofactors[r][c] = cofactors[r][c]/determinant
-            result = Matrix(cofactors)
-            return result
+            self.data = cofactors
+            return self
         raise MatrixException(MatrixException.SINGULAR_MATRIX)
 
     def gram(self):
