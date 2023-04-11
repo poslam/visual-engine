@@ -10,15 +10,6 @@ from src.classes import *
 
 m3 = Matrix([[1, 2, 3], [2, 3, 1], [5, 1, 0]])
 
-v1 = Vector([1, 2, 3])
-# v2 = Vector([5, 6, 0])
-v3 = Vector([[2], [3], [4]])
-# v4 = Vector([[0], [0], [1]])
-
-vs = VectorSpace([Vector([1, 0, 0]), Vector([0, 1, 0]), Vector([0, 0, 1])])
-
-p1 = Point([1, 1, 1])
-
 
 class TestMatrix:
     def testInitialize(self):
@@ -155,3 +146,80 @@ class TestMatrix:
         m2 = Matrix([[2, 3], [1, 0]])
         assert m1 * m1.copy().inverse() == Matrix.identity_matrix(2) and \
             m2.copy().inverse() * m2 == Matrix.identity_matrix(2)
+
+    def testGram(self):
+        m = Matrix([[1, 2], [3, 4]])
+        assert m.gram() == Matrix([[5, 11], [11, 25]])
+        
+    def testDivisionWithScalar(self):
+        m = Matrix([[1, 2], [3, 4]])
+        m1 = Matrix([[0.5, 1], [1.5, 2]])
+        assert m/2 == m1
+    
+    def testDivisionWithMatrix(self):
+        m = Matrix([[1, 2], [3, 4]])
+        m1 = Matrix([[6, 7], [4, 1]])
+        assert m/m1 == Matrix([[7/22, -5/22], [13/22, -3/22]])
+        
+    def testDivisionExceptionNotCommutative(self):
+        m = Matrix([[1, 2], [3, 4]])
+        with pytest.raises(EngineException):
+            2/m
+            
+    def testRotate(self):
+        m = Matrix([[1, 2], [3, 4]])
+        assert m.rotate([0, 1], 90) == Matrix([[2, -1], [4, -3]])
+        
+
+class TestVector:
+    def testInitializeByMatrixHorizontalValues(self):
+        m = Matrix([[1, 2, 3]])
+        v = Vector(m)
+        assert v.values == [1, 2, 3]
+        
+    def testInitializeByMatrixHorizontalAsMatrix(self):
+        m = Matrix([[1, 2, 3]])
+        v = Vector(m)
+        assert v.as_matrix == m
+        
+    def testInitializeByMatrixHorizontalSize(self):
+        m = Matrix([[1, 2, 3]])
+        v = Vector(m)
+        assert v.size == 3
+        
+    def testInitializeByMatrixHorizontalIsTransposed(self):
+        m = Matrix([[1, 2, 3]])
+        v = Vector(m)
+        assert v.is_transposed == False
+        
+    def testInitializeByMatrixVerticalValues(self):
+        m = Matrix([[2], [3], [4]])
+        v = Vector(m)
+        assert v.values == [[2], [3], [4]]
+        
+    def testInitializeByMatrixVerticalAsMatrix(self):
+        m = Matrix([[2], [3], [4]])
+        v = Vector(m)
+        assert v.as_matrix == m
+        
+    def testInitializeByMatrixVerticalSize(self):
+        m = Matrix([[2], [3], [4]])
+        v = Vector(m)
+        assert v.size == 3
+        
+    def testInitializeByMatrixVerticalIsTransposed(self):
+        m = Matrix([[2], [3], [4]])
+        v = Vector(m)
+        assert v.is_transposed == True
+        
+    def testTranspose(self):
+        v = Vector([1, 2, 3])
+        assert v.transpose() == Vector([[1], [2], [3]])
+        
+    def testTransposeParamIsTransposedHorizontal(self):
+        v = Vector([1, 2, 3])
+        assert v.transpose().is_transposed == True
+        
+    def testTransposeParamIsTransposedVertical(self):
+        v = Vector([[1], [2], [3]])
+        assert v.transpose().is_transposed == False

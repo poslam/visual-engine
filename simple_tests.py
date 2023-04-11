@@ -125,3 +125,6 @@ p1 = Point([1, 1, 1])
 #                 [0, 1, 8, 14, 17, 4, 19, 30, 4, 5]])
 
 # print(m1010.determinant())
+
+print(m1)
+print(m1.rotate([0, 1], 90))
