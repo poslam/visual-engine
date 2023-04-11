@@ -205,7 +205,7 @@ class Vector(Matrix):
                 self.is_transposed = False
                 self.size = len(values[0])
             else:
-                raise Exception("wrong size for a vector")
+                raise EngineException(EngineException.WRONG_SIZE)
         elif isinstance(values[0], (int, float)):
             self.as_matrix = Matrix([values])
             self.values = values

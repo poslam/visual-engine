@@ -212,6 +212,10 @@ class TestVector:
         v = Vector(m)
         assert v.is_transposed == True
         
+    def testInitializeExceptionWrongSize(self):
+        with pytest.raises(EngineException):
+            Vector([[2, 1], [1], [1]])
+        
     def testTranspose(self):
         v = Vector([1, 2, 3])
         assert v.transpose() == Vector([[1], [2], [3]])
@@ -223,3 +227,5 @@ class TestVector:
     def testTransposeParamIsTransposedVertical(self):
         v = Vector([[1], [2], [3]])
         assert v.transpose().is_transposed == False
+        
+    
