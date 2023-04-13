@@ -41,6 +41,10 @@ class TestMatrix:
         m1 = Matrix([[1, 2], [3, 4]])
         assert m1*i == i*m1 == m1
 
+    def testIdentityMatrixByDeterminant(self):
+        i = Matrix.identity_matrix(2)
+        assert i.determinant() == 1
+
     def testTransposeByDoubleTranspose(self):
         m1 = Matrix([[1, 2], [3, 4]])
         assert m1.transpose().transpose() == m1
