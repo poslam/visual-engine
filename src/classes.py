@@ -12,13 +12,21 @@ def restricted(self):
 class Matrix:
     def __init__(self, data: Union[list[list[float]], 'Vector']):
         if isinstance(data, Vector):
-            data = [data.values]
-        self.data = data
-        self.rows = len(data)
-        self.columns = len(data[0])
-        for i in range(self.rows-1):
-            if len(self.data[i]) != len(self.data[i+1]):
-                raise MatrixException(MatrixException.RECTANGULAR_MATRIX)
+            if data.is_transposed == True:
+                self.data = data.values
+                self.rows = data.size
+                self.columns = 1
+            else:
+                self.data = [data.values]
+                self.rows = 1
+                self.columns = data.size
+        else:
+            self.data = data
+            self.rows = len(data)
+            self.columns = len(data[0])
+            for i in range(self.rows-1):
+                if len(self.data[i]) != len(self.data[i+1]):
+                    raise MatrixException(MatrixException.RECTANGULAR_MATRIX)
 
     def zero_matrix(rows: int, columns: int):
         data = [[0 for j in range(columns)] for i in range(rows)]
@@ -31,12 +39,14 @@ class Matrix:
         return result
 
     def __eq__(self, obj: 'Matrix'):
-        if self.rows == obj.rows and self.columns == obj.columns:
-            eps = 10**(-7)
-            return all(abs(self[i][j] - obj[i][j]) < eps
-                       for i in range(self.rows)
-                       for j in range(self.columns))
-        return False
+        if not (self.rows == obj.rows and self.columns == obj.columns):
+            return False
+        
+        eps = 10**(-7)
+        return all(abs(self[i][j] - obj[i][j]) < eps
+                    for i in range(self.rows)
+                    for j in range(self.columns))
+    
 
     def __add__(self, obj: 'Matrix'):
         if not isinstance(obj, Matrix):
@@ -208,11 +218,18 @@ class Vector(Matrix):
             raise EngineException(EngineException.WRONG_USAGE)
 
         if isinstance(values, Matrix):
-            if values.rows != 1 or values.columns != 1:
+            if 1 not in (values.rows, values.columns):
                 raise EngineException(EngineException.WRONG_SIZE)
 
             self.size = [x for x in (values.rows, values.columns) if x != 1]
-            self.values = values.data
+            values = values.data
+          
+          # не работает  
+        # elif isinstance(values[0], list):
+        #     if len(values[0]) == 1:
+        #         for i in range(len(values)-1):
+        #             if len(values[i]) != len(values[i+1]):
+        #                 raise MatrixException(MatrixException.RECTANGULAR_MATRIX)
 
         if isinstance(values[0], list):
             if len(values[0]) == 1:
@@ -230,7 +247,7 @@ class Vector(Matrix):
             self.size = len(values)
 
     def as_matrix(self):
-        return Matrix(self.values)
+        return Matrix(self)
 
     def transpose(self):
         temp = Vector(self.as_matrix().transpose())

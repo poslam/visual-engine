@@ -129,4 +129,9 @@ p1 = Point([1, 1, 1])
 # # print(m1.rotate([0, 1], 90))
 
 
-print(v1.as_matrix().columns)
+m = Matrix([[2], [3], [4]])
+v1 = Vector(m)
+v2 = Vector(Matrix([[1, 2, 3]]))
+
+# act = (v.as_matrix() == [[2], [3], [4]])
+print(v2.as_matrix() == Matrix([[1, 2, 3]]))

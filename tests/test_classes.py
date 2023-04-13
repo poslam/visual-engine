@@ -279,7 +279,7 @@ class TestVector:
         m = Matrix([[1, 2, 3]])
         v = Vector(m)
         
-        act = (v.as_matrix == m)
+        act = (v.as_matrix() == m)
         
         assert act
         
@@ -311,7 +311,7 @@ class TestVector:
         m = Matrix([[2], [3], [4]])
         v = Vector(m)
         
-        act = (v.as_matrix == m)
+        act = (v.as_matrix() == m)
         
         assert act
         
