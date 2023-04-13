@@ -33,7 +33,7 @@ class Matrix:
     def __eq__(self, obj: 'Matrix'):
         if self.rows == obj.rows and self.columns == obj.columns:
             eps = 10**(-7)
-            return all(abs(self[i][j] - obj[i][j]) < eps 
+            return all(abs(self[i][j] - obj[i][j]) < eps
                        for i in range(self.rows)
                        for j in range(self.columns))
         return False
@@ -183,8 +183,10 @@ class Matrix:
         rotation_matrix[axes_indecies[0]][axes_indecies[0]] = cos(angle)
         rotation_matrix[axes_indecies[1]][axes_indecies[1]] = cos(angle)
 
-        rotation_matrix[axes_indecies[1]][axes_indecies[0]] = (-1)**n * sin(angle)
-        rotation_matrix[axes_indecies[0]][axes_indecies[1]] = (-1)**(n+1) * sin(angle)
+        rotation_matrix[axes_indecies[1]
+                        ][axes_indecies[0]] = (-1)**n * sin(angle)
+        rotation_matrix[axes_indecies[0]
+                        ][axes_indecies[1]] = (-1)**(n+1) * sin(angle)
 
         self.data = (self * rotation_matrix).data
         return self
@@ -280,7 +282,7 @@ class Vector(Matrix):
     def len(self):
         return (self & self)**0.5
 
-    ### new
+    # new
 
     def rotate(self, axes_indecies: list[int], angle: float):
         if self.is_transposed == False:
@@ -339,7 +341,7 @@ class Point(Vector):
 
 class VectorSpace:
 
-    ### new
+    # new
 
     def __init__(self, basis: list[Vector]):
         self.basis = Matrix([vec.values for vec in basis])
@@ -374,7 +376,7 @@ class VectorSpace:
         raise EngineException(EngineException.WRONG_SIZE)
 
 
-class CoorinateSystem:
+class CoordinateSystem:
     def __init__(self, initial_point: Point, vs: VectorSpace):
         self.initial_point = initial_point
         self.vs = vs
