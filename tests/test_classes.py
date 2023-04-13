@@ -12,7 +12,10 @@ from src.classes import *
 class TestMatrix:
     def testInitialize(self):
         m1 = Matrix([[1, 2], [3, 4]])
-        assert isinstance(m1, Matrix)
+        
+        act = isinstance(m1, Matrix)
+        
+        assert act
         
     def testExceptionRectangularMatrixInInit(self):
         with pytest.raises(MatrixException):
@@ -20,10 +23,12 @@ class TestMatrix:
 
     def testDataIsList(self):
         m1 = Matrix([[1, 2], [3, 4]])
+        
         assert isinstance(m1.data, list)
 
     def testSizeAutoComplete(self):
         m = Matrix([[1, 2], [3, 4], [5, 6]])
+        
         assert m.rows == 3 and m.columns == 2
 
     def testZeroMatrixSize(self):
@@ -32,6 +37,7 @@ class TestMatrix:
 
     def testZeroMatrixData(self):
         zero = Matrix.zero_matrix(2, 5)
+        
         assert all(zero[i][j] == 0 
                    for i in range(2)
                    for j in range(5))
@@ -39,6 +45,7 @@ class TestMatrix:
     def testIdentityMatrixByProduct(self):
         i = Matrix.identity_matrix(2)
         m1 = Matrix([[1, 2], [3, 4]])
+        
         assert m1*i == i*m1 == m1
 
     def testIdentityMatrixByDeterminant(self):
@@ -50,23 +57,27 @@ class TestMatrix:
         assert m1.transpose().transpose() == m1
 
     def testEquationBySameMatrices(self):
-        m = Matrix([[1+10**(-8), 2, 3], [2, 3, 1], [5, 1, 0]])
+        m = Matrix([[1 + 10**(-8), 2, 3], [2, 3, 1], [5, 1, 0]])
         m3 = Matrix([[1, 2, 3], [2, 3, 1], [5, 1, 0]])
+        
         assert m3 == m
 
     def testEpsilonParamInEquation(self):
         m = Matrix([[1+10**(-5), 2, 3], [2, 3, 1], [5, 1, 0]])
         m3 = Matrix([[1, 2, 3], [2, 3, 1], [5, 1, 0]])
+        
         assert m3 != m
 
     def testEquationByDifferentMatrices(self):
         m1 = Matrix([[1, 2], [3, 4]])
         m2 = Matrix([[2, 3], [1, 0]])
+        
         assert m1 != m2
 
     def testIdentityMatrix(self):
         m7 = Matrix([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
         i3 = Matrix.identity_matrix(3)
+        
         assert i3 == m7
         
     def testAdditionCorrect(self):

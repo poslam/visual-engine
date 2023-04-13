@@ -353,16 +353,15 @@ class VectorSpace:
             self.triplet_left = True
 
     def scalar_product(self, vec1: 'Vector', vec2: 'Vector'):
-        if vec1.is_transposed == False and vec2.is_transposed == False:
-            return (vec1.as_matrix*Matrix.gram(self.basis)*vec2.transpose().as_matrix)[0][0]
-        elif vec1.is_transposed == False and vec2.is_transposed:
-            return (vec1.as_matrix*Matrix.gram(self.basis)*vec2.as_matrix)[0][0]
-        elif vec1.is_transposed and vec2.is_transposed:
-            return (vec1.transpose().as_matrix*Matrix.gram(self.basis)*vec2.as_matrix)[0][0]
-        elif vec1.is_transposed and vec2.is_transposed == False:
-            return (vec1.transpose().as_matrix*Matrix.gram(self.basis)*vec2.transpose().as_matrix)[0][0]
-        raise EngineException(EngineException.WRONG_USAGE)
-
+        
+        if vec1.is_transposed:
+            vec1 = vec1.transpose()
+            
+        if not vec2.is_transposed:
+            vec2 = vec2.transpose()
+        
+        return (vec1.as_matrix * Matrix.gram(self.basis) * vec2.as_matrix)[0][0]
+        
     def as_vector(self, point: Point):
         if point.size == self.size:
             result = Matrix.zero_matrix(1, point.size)
