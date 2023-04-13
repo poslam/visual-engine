@@ -39,25 +39,28 @@ class Matrix:
         return False
 
     def __add__(self, obj: 'Matrix'):
-        if isinstance(obj, Matrix):
-            result = Matrix.zero_matrix(self.rows, self.columns)
-            if self.rows == obj.rows and self.columns == obj.columns:
-                result.data = [[self.data[row][column] + obj.data[row][column]
-                                for column in range(self.columns)]
-                               for row in range(self.rows)]
-                return result
+        if not isinstance(obj, Matrix):
+            raise EngineException(EngineException.WRONG_USAGE)
+
+        if not (self.rows == obj.rows and self.columns == obj.columns):
             raise EngineException(EngineException.WRONG_SIZE)
-        raise EngineException(EngineException.WRONG_USAGE)
+
+        result = Matrix.zero_matrix(self.rows, self.columns)
+        result.data = [[self.data[row][column] + obj.data[row][column]
+                        for column in range(self.columns)]
+                       for row in range(self.rows)]
+        return result
 
     def __product(obj1: Union['Matrix', float, int],
                   obj2: Union['Matrix', float, int]):
         if isinstance(obj1, Matrix) and isinstance(obj2, Matrix):
-            if obj1.columns == obj2.rows:
-                result = [[sum(a * b for a, b in zip(A_row, B_col))
-                           for B_col in zip(*obj2.data)]
-                          for A_row in obj1.data]
-                return Matrix(result)
-            raise EngineException(EngineException.WRONG_SIZE)
+            if not (obj1.columns == obj2.rows):
+                raise EngineException(EngineException.WRONG_SIZE)
+
+            result = [[sum(a * b for a, b in zip(A_row, B_col))
+                       for B_col in zip(*obj2.data)]
+                      for A_row in obj1.data]
+            return Matrix(result)
 
         elif isinstance(obj1, (float, int)) and isinstance(obj2, Matrix):
             result = obj2.copy()
@@ -98,15 +101,13 @@ class Matrix:
         return f'{self.data}'
 
     def transpose(self):
-        if isinstance(self, Matrix):
-            self.data = [[self[j][i] for j in range(self.rows)]
-                         for i in range(self.columns)]
-            self.rows, self.columns = self.columns, self.rows
-            return self
-        if isinstance(self, list):
-            return [[self[j][i] for j in range(len(self))]
-                    for i in range(len(self[0]))]
-        raise EngineException(EngineException.WRONG_USAGE)
+        if not isinstance(self, Matrix):
+            raise EngineException(EngineException.WRONG_USAGE)
+
+        self.data = [[self[j][i] for j in range(self.rows)]
+                     for i in range(self.columns)]
+        self.rows, self.columns = self.columns, self.rows
+        return self
 
     def __minor(self, i: int, j: int):
         return [row[:j] + row[j+1:] for row in (self[:i]+self[i+1:])]
@@ -117,58 +118,67 @@ class Matrix:
         else:
             matrix = self
 
-        if len(matrix) == len(matrix[0]):
-            if len(matrix) == 2:
-                return matrix[0][0]*matrix[1][1] - matrix[0][1]*matrix[1][0]
+        if not (len(matrix) == len(matrix[0])):
+            raise MatrixException(MatrixException.QUADRATIC_MATRIX)
 
-            determinant = 0
-            for c in range(len(matrix)):
-                determinant += ((-1)**c)*matrix[0][c] *\
-                    Matrix.determinant(Matrix.__minor(matrix, 0, c))
-            return determinant
-        raise MatrixException(MatrixException.QUADRATIC_MATRIX)
+        if len(matrix) == 2:
+            return matrix[0][0]*matrix[1][1] - matrix[0][1]*matrix[1][0]
+
+        determinant = 0
+        for c in range(len(matrix)):
+            determinant += ((-1)**c)*matrix[0][c] *\
+                Matrix.determinant(Matrix.__minor(matrix, 0, c))
+        return determinant
 
     def inverse(self):
         determinant = Matrix.determinant(self)
-        if determinant != 0:
-            if self.rows == 2:
-                self.data = [[self[1][1]/determinant, -1*self[0][1]/determinant],
-                             [-1*self[1][0]/determinant, self[0][0]/determinant]]
-                return self
 
-            cofactors = []
-            for r in range(self.rows):
-                cofactorRow = []
-                for c in range(self.rows):
-                    __minor = Matrix.__minor(self, r, c)
-                    cofactorRow.append(((-1)**(r+c)) *
-                                       Matrix.determinant(__minor))
-                cofactors.append(cofactorRow)
-            cofactors = Matrix.transpose(cofactors)
-            for r in range(len(cofactors)):
-                for c in range(len(cofactors)):
-                    cofactors[r][c] = cofactors[r][c]/determinant
-            self.data = cofactors
+        if determinant == 0:
+            raise MatrixException(MatrixException.SINGULAR_MATRIX)
+
+        if self.rows == 2:
+            self.data = [[self[1][1]/determinant, -1*self[0][1]/determinant],
+                         [-1*self[1][0]/determinant, self[0][0]/determinant]]
             return self
-        raise MatrixException(MatrixException.SINGULAR_MATRIX)
+
+        cofactors = []
+        for r in range(self.rows):
+            cofactorRow = []
+            for c in range(self.rows):
+                __minor = Matrix.__minor(self, r, c)
+                cofactorRow.append(((-1)**(r+c)) *
+                                   Matrix.determinant(__minor))
+            cofactors.append(cofactorRow)
+        cofactors = Matrix.transpose(cofactors)
+        for r in range(len(cofactors)):
+            for c in range(len(cofactors)):
+                cofactors[r][c] = cofactors[r][c]/determinant
+        self.data = cofactors
+        return self
 
     def gram(self):
-        if self.rows == self.columns:
-            result = Matrix.zero_matrix(self.rows, self.rows)
-            identity = Matrix.identity_matrix(self.rows)
-            for i in range(self.rows):
-                for j in range(self.columns):
-                    result[i][j] = BilinearForm(
-                        identity, Vector(self[i]), Vector(self[j]))
-            return result
-        raise MatrixException(MatrixException.QUADRATIC_MATRIX)
+        if self.rows != self.columns:
+            raise MatrixException(MatrixException.QUADRATIC_MATRIX)
+
+        result = Matrix.zero_matrix(self.rows, self.rows)
+        identity = Matrix.identity_matrix(self.rows)
+        for i in range(self.rows):
+            for j in range(self.columns):
+                result[i][j] = BilinearForm(
+                    identity, Vector(self[i]), Vector(self[j]))
+        return result
 
     def __truediv__(self, obj: Union['Matrix', int, float]):
-        if isinstance(self, Matrix) and isinstance(obj, (int, float)):
+        if not isinstance(self, Matrix):
+            raise EngineException(EngineException.WRONG_USAGE)
+
+        if isinstance(obj, (int, float)):
             return self * (1/obj)
-        if isinstance(self, Matrix) and isinstance(obj, Matrix):
+        elif isinstance(obj, Matrix):
             return self * obj.inverse()
-        raise EngineException(EngineException.WRONG_USAGE)
+
+        else:
+            raise EngineException(EngineException.WRONG_USAGE)
 
     def __rtruediv__(self, obj):
         raise EngineException(EngineException.WRONG_USAGE)
@@ -194,31 +204,37 @@ class Matrix:
 
 class Vector(Matrix):
     def __init__(self, values: Union[list[list[float]], Matrix]):
+        if not isinstance(values, list) or not isinstance(values, Matrix) or len(values[0]) == 0:
+            raise EngineException(EngineException.WRONG_USAGE)
+
         if isinstance(values, Matrix):
-            values = values.data
+            if values.rows != 1 or values.columns != 1:
+                raise EngineException(EngineException.WRONG_SIZE)
+
+            self.size = [x for x in (values.rows, values.columns) if x != 1]
+            self.values = values.data
+
         if isinstance(values[0], list):
             if len(values[0]) == 1:
-                self.as_matrix = Matrix(values)
                 self.values = values
                 self.is_transposed = True
                 self.size = len(values)
             elif len(values) == 1:
-                self.as_matrix = Matrix(values)
                 self.values = values[0]
                 self.is_transposed = False
                 self.size = len(values[0])
-            else:
-                raise EngineException(EngineException.WRONG_SIZE)
+
         elif isinstance(values[0], (int, float)):
-            self.as_matrix = Matrix([values])
             self.values = values
             self.is_transposed = False
             self.size = len(values)
 
+    def as_matrix(self):
+        return Matrix(self.values)
+
     def transpose(self):
-        temp = Vector(self.as_matrix.transpose())
+        temp = Vector(self.as_matrix().transpose())
         self.values = temp.values
-        self.as_matrix = temp.as_matrix
         self.is_transposed = not (self.is_transposed)
         return self
 
@@ -234,22 +250,22 @@ class Vector(Matrix):
         raise EngineException(EngineException.WRONG_SIZE)
 
     def __vector_product(self, obj: 'Vector'):
-        if self.size == 3 and obj.size == 3:
-            return Vector([self[1]*obj[2] - self[2]*obj[1],
-                           self[2]*obj[0] - self[0]*obj[2],
-                           self[0]*obj[1] - self[1]*obj[0]])
-        raise EngineException(EngineException.DIMENSION_ERROR(3))
+        if not (self.size == 3 and obj.size == 3):
+            raise EngineException(EngineException.DIMENSION_ERROR(3))
+        return Vector([self[1]*obj[2] - self[2]*obj[1],
+                       self[2]*obj[0] - self[0]*obj[2],
+                       self[0]*obj[1] - self[1]*obj[0]])
 
     def __add__(self, obj: 'Vector'):
         if isinstance(self, Vector) and isinstance(obj, Vector):
             if self.size == obj.size:
                 if self.is_transposed == False and obj.is_transposed == False:
-                    return Vector((self.as_matrix+obj.as_matrix).data)
+                    return Vector((self.as_matrix()+obj.as_matrix()).data)
                 elif self.is_transposed == True and obj.is_transposed == False:
-                    return Vector((self.transpose().as_matrix+obj.as_matrix).data)
+                    return Vector((self.transpose().as_matrix()+obj.as_matrix()).data)
                 elif self.is_transposed == False and obj.is_transposed == True:
-                    return Vector((self.as_matrix+obj.transpose().as_matrix).data)
-                return Vector((self.as_matrix+obj.as_matrix).data)
+                    return Vector((self.as_matrix()+obj.transpose().as_matrix()).data)
+                return Vector((self.as_matrix()+obj.as_matrix()).data)
             raise EngineException(EngineException.WRONG_SIZE)
         raise EngineException(EngineException.WRONG_USAGE)
 
@@ -258,10 +274,10 @@ class Vector(Matrix):
 
     def __mul__(self, obj: Union[int, float, 'Vector']):
         if isinstance(obj, Vector):
-            result = self.as_matrix * obj.as_matrix
+            result = self.as_matrix() * obj.as_matrix()
             return Vector(result)
         elif isinstance(obj, (int, float)):
-            result = self.as_matrix * obj
+            result = self.as_matrix() * obj
             return Vector(result)
         raise EngineException(EngineException.WRONG_USAGE)
 
@@ -277,7 +293,7 @@ class Vector(Matrix):
         return f'{self.values}'
 
     def __eq__(self, obj: 'Vector'):
-        return self.as_matrix == obj.as_matrix
+        return self.as_matrix() == obj.as_matrix()
 
     def len(self):
         return (self & self)**0.5
@@ -286,9 +302,9 @@ class Vector(Matrix):
 
     def rotate(self, axes_indecies: list[int], angle: float):
         if self.is_transposed == False:
-            self.values = self.as_matrix.rotate(axes_indecies, angle).data[0]
+            self.values = self.as_matrix().rotate(axes_indecies, angle).data[0]
             return self
-        self.values = self.transpose().as_matrix.rotate(
+        self.values = self.transpose().as_matrix().rotate(
             axes_indecies, angle).transpose().data
         return self
 
@@ -353,15 +369,15 @@ class VectorSpace:
             self.triplet_left = True
 
     def scalar_product(self, vec1: 'Vector', vec2: 'Vector'):
-        
+
         if vec1.is_transposed:
             vec1 = vec1.transpose()
-            
+
         if not vec2.is_transposed:
             vec2 = vec2.transpose()
-        
-        return (vec1.as_matrix * Matrix.gram(self.basis) * vec2.as_matrix)[0][0]
-        
+
+        return (vec1.as_matrix() * Matrix.gram(self.basis) * vec2.as_matrix())[0][0]
+
     def as_vector(self, point: Point):
         if point.size == self.size:
             result = Matrix.zero_matrix(1, point.size)
