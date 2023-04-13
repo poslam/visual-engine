@@ -1,3 +1,5 @@
+### new
+
 def init():
-    global vec_space
-    vs_space = None
+    global coord_system
+    coord_system = None

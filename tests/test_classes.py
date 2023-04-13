@@ -8,8 +8,6 @@ sys.path.append(os.path.dirname(SCRIPT_DIR))
 
 from src.classes import *
 
-m3 = Matrix([[1, 2, 3], [2, 3, 1], [5, 1, 0]])
-
 
 class TestMatrix:
     def testInitialize(self):
@@ -49,10 +47,12 @@ class TestMatrix:
 
     def testEquationBySameMatrices(self):
         m = Matrix([[1+10**(-8), 2, 3], [2, 3, 1], [5, 1, 0]])
+        m3 = Matrix([[1, 2, 3], [2, 3, 1], [5, 1, 0]])
         assert m3 == m
 
     def testEpsilonParamInEquation(self):
         m = Matrix([[1+10**(-5), 2, 3], [2, 3, 1], [5, 1, 0]])
+        m3 = Matrix([[1, 2, 3], [2, 3, 1], [5, 1, 0]])
         assert m3 != m
 
     def testEquationByDifferentMatrices(self):
@@ -66,6 +66,7 @@ class TestMatrix:
         assert i3 == m7
         
     def testAdditionCorrect(self):
+        m3 = Matrix([[1, 2, 3], [2, 3, 1], [5, 1, 0]])
         m7 = Matrix([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
         m8 = Matrix([[2, 2, 3], [2, 4, 1], [5, 1, 1]])
         assert m3 + m7 == m8
@@ -83,6 +84,7 @@ class TestMatrix:
     def testAdditionExceptionWrongSize(self):
         with pytest.raises(EngineException):
             m1 = Matrix([[1, 2], [3, 4]])
+            m3 = Matrix([[1, 2, 3], [2, 3, 1], [5, 1, 0]])
             m1+m3
         
     def testAdditionExceptionWrongUsage(self):
@@ -97,6 +99,7 @@ class TestMatrix:
     def testProductExceptionWrongSize(self):
         with pytest.raises(EngineException):
             m1 = Matrix([[1, 2], [3, 4]])
+            m3 = Matrix([[1, 2, 3], [2, 3, 1], [5, 1, 0]])
             m1*m3
             
     def testProductExceptionWrongUsage(self):
@@ -121,9 +124,11 @@ class TestMatrix:
         
     def testProductWithScalar(self):
         m10 = Matrix([[4, 8, 12], [8, 12, 4], [20, 4, 0]])
+        m3 = Matrix([[1, 2, 3], [2, 3, 1], [5, 1, 0]])
         assert m3*4 == m10
         
     def testProductWithScalarCommutative(self):
+        m3 = Matrix([[1, 2, 3], [2, 3, 1], [5, 1, 0]])
         assert m3*4 == 4*m3
         
     def testSubtraction(self):
@@ -228,4 +233,111 @@ class TestVector:
         v = Vector([[1], [2], [3]])
         assert v.transpose().is_transposed == False
         
+    def testAdditionHorizontal(self):
+        v1 = Vector([1, 2, 3])
+        v2 = Vector([3, 4, 5])
+        v3 = v1+v2
+        assert v3.values == [4, 6, 8] and v3 == Vector([4, 6, 8])
+        
+    def testAdditionVertical(self):
+        v1 = Vector([[1], [2], [3]])
+        v2 = Vector([[3], [4], [5]])
+        v3 = v1+v2
+        assert v3.values == [[4], [6], [8]] and v3 == Vector([[4], [6], [8]])
+        
+    def testAdditionExceptionWrongSize(self):
+        v1 = Vector([1, 2, 3])
+        v2 = Vector([1, 2, 3, 4])
+        with pytest.raises(EngineException):
+            v1 + v2
+            
+    def testAdditionExceptionWrongSize(self):
+        v1 = Vector([1, 2, 3])
+        with pytest.raises(EngineException):
+            v1 + 2
+            
+    def testScalarProduct(self):
+        v1 = Vector([1, 2, 3])
+        v2 = Vector([1, 2, 4])
+        assert v1&v2 == 17
+        
+    def testVectorProduct(self):
+        v1 = Vector([1, 2, 3])
+        v2 = Vector([1, 2, 4])
+        assert v1**v2 == Vector([2, -1, 0])
+        
+    def testVectorProductExceptiot(self):
+        v1 = Vector([1, 2, 3])
+        v2 = Vector([1, 2, 4, 5])
+        with pytest.raises(EngineException):
+            v1*v2
+            
+    def testMultiplyWithScalar(self):
+        v1 = Vector([1, 2, 3])
+        assert v1 * 2 == Vector([2, 4, 6])
+        
+    def testMultiplyWithVector(self):
+        v1 = Vector([1, 2, 3])
+        v2 = Vector([[1], [2], [4]])
+        assert v1*v2 == Vector([17])
+        
+    def testMultiplyException(self):
+        v1 = Vector([1, 2, 3])
+        with pytest.raises(EngineException):
+            v1 * 'xyz'
+            
+    def testSubtractionHorizontal(self):
+        v1 = Vector([1, 2, 3])
+        v2 = Vector([1, 2, 4])
+        assert v2 - v1 == Vector([0, 0, 1])
+        
+    def testSubtractionVertical(self):
+        v1 = Vector([[1], [2], [3]])
+        v2 = Vector([[1], [2], [4]])
+        assert v2 - v1 == Vector([[0], [0], [1]])
+        
+    def testLen(self):
+        v1 = Vector([1, 2, 3])
+        assert v1.len() == 14**0.5 
+        
+    def testRotate(self):
+        v = Vector([1, 2, 3])
+        assert v.rotate([0, 1], 90) == Vector([2, -1, 3])
     
+
+class TestPoint:
+    def testAddition(self):
+        p = Point([1, 1, 1])
+        v = Vector([1, 2, 3])
+        assert v+p == Point([2, 3, 4]) and p+v == Point([2, 3, 4])
+        
+    def testAdditionCommutatiove(self):
+        p = Point([1, 1, 1])
+        v = Vector([1, 2, 3])
+        assert p+v == Point([2, 3, 4])
+        
+    def testAdditionException(self):
+        p = Point([1, 1, 1])    
+        with pytest.raises(EngineException):
+            p+1
+            
+    def testSubtraction(self):
+        p = Point([1, 1, 1]) 
+        v = Vector([1, 2, 3])
+        assert p-v == Point([0, -1, -2])
+    
+
+class TestVectorSpace:
+    def testInitialize(self):
+        assert VectorSpace([Vector([1, 0, 0]), Vector([0, 1, 0]), Vector([0, 0, 1])])
+        
+    def testScalarProduct(self):
+        vs = VectorSpace([Vector([1, 0, 0]), Vector([0, 1, 0]), Vector([0, 0, 1])])
+        v1 = Vector([1, 2, 3])
+        v2 = Vector([1, 2, 4])
+        assert vs.scalar_product(v1, v2) == v1&v2
+
+    def testAsVector(self):
+        vs = VectorSpace([Vector([1, 0, 0]), Vector([0, 1, 0]), Vector([0, 0, 1])])
+        p = Point([1, 2, 3])
+        assert vs.as_vector(p) == Vector([1, 2, 3])

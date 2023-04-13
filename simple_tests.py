@@ -14,7 +14,6 @@ v3 = Vector([[2], [3], [4]])
 v4 = Vector([[0], [0], [1]])
 
 vs = VectorSpace([Vector([1, 0, 0]), Vector([0, 1, 0]), Vector([0, 0, 1])])
-globals.vs_space = vs
 
 p1 = Point([1, 1, 1])
 
@@ -126,5 +125,6 @@ p1 = Point([1, 1, 1])
 
 # print(m1010.determinant())
 
-print(m1)
-print(m1.rotate([0, 1], 90))
+# print(m1)
+# print(m1.rotate([0, 1], 90))
+

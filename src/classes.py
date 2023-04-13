@@ -33,8 +33,9 @@ class Matrix:
     def __eq__(self, obj: 'Matrix'):
         if self.rows == obj.rows and self.columns == obj.columns:
             eps = 10**(-7)
-            if all(abs(self[i][j] - obj[i][j]) < eps for i in range(self.rows) for j in range(self.columns)):
-                return True
+            return all(abs(self[i][j] - obj[i][j]) < eps 
+                       for i in range(self.rows)
+                       for j in range(self.columns))
         return False
 
     def __add__(self, obj: 'Matrix'):
@@ -246,7 +247,7 @@ class Vector(Matrix):
                     return Vector((self.transpose().as_matrix+obj.as_matrix).data)
                 elif self.is_transposed == False and obj.is_transposed == True:
                     return Vector((self.as_matrix+obj.transpose().as_matrix).data)
-                return Vector((self.as_matrix+obj.as_matrix).data).transpose()
+                return Vector((self.as_matrix+obj.as_matrix).data)
             raise EngineException(EngineException.WRONG_SIZE)
         raise EngineException(EngineException.WRONG_USAGE)
 
@@ -279,7 +280,7 @@ class Vector(Matrix):
     def len(self):
         return (self & self)**0.5
 
-    # new
+    ### new
 
     def rotate(self, axes_indecies: list[int], angle: float):
         if self.is_transposed == False:
@@ -338,7 +339,7 @@ class Point(Vector):
 
 class VectorSpace:
 
-    # new
+    ### new
 
     def __init__(self, basis: list[Vector]):
         self.basis = Matrix([vec.values for vec in basis])
