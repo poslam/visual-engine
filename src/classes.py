@@ -203,8 +203,8 @@ class Matrix:
 
 
 class Vector(Matrix):
-    def __init__(self, values: Union[list[list[float]], Matrix]):
-        if not isinstance(values, list) or not isinstance(values, Matrix) or len(values[0]) == 0:
+    def __init__(self, values: Union[list[float], list[list[float]], Matrix]):
+        if not isinstance(values, list) and not isinstance(values, Matrix):
             raise EngineException(EngineException.WRONG_USAGE)
 
         if isinstance(values, Matrix):
