@@ -7,6 +7,7 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(SCRIPT_DIR))
 
 from src.classes import *
+import src.globals as globals
 
 
 class TestMatrix:
@@ -18,7 +19,7 @@ class TestMatrix:
         assert act
         
     def testExceptionRectangularMatrixInInit(self):
-        with pytest.raises(MatrixException):
+        with pytest.raises(EngineException):
             act = Matrix([[1, 2], [3]])
 
     def testDataIsList(self):
@@ -261,7 +262,7 @@ class TestMatrix:
     def testRotate(self):
         m = Matrix([[1, 2], [3, 4]])
         
-        act = (m.rotate([0, 1], 90) == Matrix([[2, -1], [4, -3]]))
+        act = (m.rotate([0, 1], 90) == Matrix([[-2, 1], [-4, 3]]))
         
         assert act
         
@@ -398,6 +399,10 @@ class TestVector:
     def testVectorProduct(self):
         v1 = Vector([1, 2, 3])
         v2 = Vector([1, 2, 4])
+        vs = VectorSpace([Vector([1, 0, 0]), Vector([0, 1, 0]), Vector([0, 0, 1])])
+        p1 = Point([0, 0, 0])
+        cs = CoordinateSystem(p1, vs)
+        globals.coord_system = cs
         
         act = (v1**v2 == Vector([2, -1, 0]))
         
@@ -451,7 +456,7 @@ class TestVector:
     def testRotate(self):
         v = Vector([1, 2, 3])
         
-        act = (v.rotate([0, 1], 90) == Vector([2, -1, 3]))
+        act = (v.rotate([0, 1], 90) == Vector([-2, 1, 3]))
         
         assert act
     

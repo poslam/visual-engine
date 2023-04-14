@@ -13,9 +13,12 @@ v2 = Vector([5, 6, 0])
 v3 = Vector([[2], [3], [4]])
 v4 = Vector([[0], [0], [1]])
 
-# vs = VectorSpace([Vector([1, 0, 0]), Vector([0, 1, 0]), Vector([0, 0, 1])])
+vs = VectorSpace([Vector([1, 0, 0]), Vector([0, 1, 0]), Vector([0, 0, 1])])
 
-p1 = Point([1, 1, 1])
+p1 = Point([0, 0, 0])
+
+cs = CoordinateSystem(p1, vs)
+globals.coord_system = cs
 
 # print("m1", m1)
 # print("m2", m2)
@@ -129,9 +132,11 @@ p1 = Point([1, 1, 1])
 # # print(m1.rotate([0, 1], 90))
 
 
-m = Matrix([[2], [3], [4]])
-v1 = Vector(m)
-v2 = Vector(Matrix([[1, 2, 3]]))
+# m = Matrix([[2], [3], [4]])
+# v1 = Vector(m)
+# v2 = Vector(Matrix([[1, 2, 3]]))
 
-# act = (v.as_matrix() == [[2], [3], [4]])
-print(v2.as_matrix() == Matrix([[1, 2, 3]]))
+# # act = (v.as_matrix() == [[2], [3], [4]])
+# print(v2.as_matrix() == Matrix([[1, 2, 3]]))
+
+print(v1**v2)
