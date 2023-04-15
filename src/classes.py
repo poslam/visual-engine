@@ -432,20 +432,6 @@ class VectorSpace:
 
         return (vec1.as_matrix() * Matrix.gram(self.basis) * vec2.as_matrix())[0][0]
     
-    # def vector_product(self, vec1: Vector, vec2: Vector):
-    #     if self.size != 3:
-    #         raise EngineException(EngineException.DIMENSION_ERROR)
-        
-    #     bas1 = vector_product(self.basis[1], self.basis[2])
-    #     bas2 = vector_product(self.basis[2], self.basis[0])
-    #     bas3 = vector_product(self.basis[0], self.basis[1])
-        
-    #     res_vec1 = bas1 * (vec1[1]*vec2[2] - vec1[2]*vec2[1])
-    #     res_vec2 = bas2 * (vec1[2]*vec2[0] - vec1[0]*vec2[2])
-    #     res_vec3 = bas3 * (vec1[0]*vec2[1] - vec1[1]*vec2[0])
-        
-    #     return res_vec1+res_vec2+res_vec3
-
     def as_vector(self, point: Point):
         if point.size != self.size:
             raise EngineException(EngineException.WRONG_SIZE)
