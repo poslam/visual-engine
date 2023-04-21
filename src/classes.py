@@ -12,7 +12,7 @@ def restricted(self):
 class Matrix:
     def __init__(self, data: Union[list[list[float]], 'Vector']):
         if isinstance(data, Vector):
-            if data.is_transposed == True:
+            if data.is_transposed:
                 self.data = data.values
                 self.rows = data.size
                 self.columns = 1
@@ -93,8 +93,31 @@ class Matrix:
             raise EngineException(EngineException.WRONG_USAGE)
 
     def __minor(self, i: int, j: int):
-        return [row[:j] + row[j+1:] for row in (self[:i]+self[i+1:])]
+        minor_data = self.copy().data
+        minor_data.pop(i)
+        for row in range(len(minor_data)):
+            minor_data[row].pop(j)
+        return Matrix(minor_data)
 
+    # def determinant(self):
+    #     if isinstance(self, Matrix):
+    #         matrix = self.data
+    #     else:
+    #         matrix = self
+
+    #     if not (len(matrix) == len(matrix[0])):
+    #         raise MatrixException(MatrixException.QUADRATIC_MATRIX)
+
+    #     if len(matrix) == 1:
+    #         return matrix[0][0]
+
+    #     determinant = 0
+    #     for c in range(len(matrix)):
+    #         determinant += ((-1)**c)*matrix[0][c] *\
+    #             Matrix.determinant(Matrix.__minor(matrix, 0, c))
+                
+    #     return determinant
+    
     def determinant(self):
         if isinstance(self, Matrix):
             matrix = self.data
@@ -102,17 +125,26 @@ class Matrix:
             matrix = self
 
         if not (len(matrix) == len(matrix[0])):
-            raise MatrixException(MatrixException.QUADRATIC_MATRIX)
+            raise MatrixException(MatrixException.QUADRATIC_MATRIX)        
 
-        if len(matrix) == 1:
-            return matrix[0][0]
+        if self.rows == 1:
+            return self.data[0][0]
 
-        determinant = 0
-        for c in range(len(matrix)):
-            determinant += ((-1)**c)*matrix[0][c] *\
-                Matrix.determinant(Matrix.__minor(matrix, 0, c))
-                
-        return determinant
+        elif isinstance(self.data[0][0], (int, float)):
+            size = self.columns
+            result = 0
+            for index in range(size):
+                submatrix = self.__minor(0, index)
+                det = submatrix.determinant()
+                result += (-1)**index * det * self.data[0][index]
+        else: 
+            size = self.columns
+            result = Vector([0, 0, 0])
+            for index in range(size):
+                submatrix = self.__minor(0, index)
+                det = submatrix.determinant()
+                result += (-1)**index * det * self.data[0][index]
+        return result
 
     def inverse(self):
         determinant = Matrix.determinant(self)
@@ -295,20 +327,19 @@ class Vector(Matrix):
         return BilinearForm(identity, self, obj)
 
     def __vector_product(self, obj: 'Vector'):
-        if self.size != 3:
-            raise EngineException(EngineException.DIMENSION_ERROR)
-        
-        basis = globals.coord_system.vs.basis
-        
-        bas1 = vector_product(basis[1], basis[2])
-        bas2 = vector_product(basis[2], basis[0])
-        bas3 = vector_product(basis[0], basis[1])
-        
-        res_vec1 = bas1 * (self[1]*obj[2] - self[2]*obj[1])
-        res_vec2 = bas2 * (self[2]*obj[0] - self[0]*obj[2])
-        res_vec3 = bas3 * (self[0]*obj[1] - self[1]*obj[0])
-        
-        return res_vec1+res_vec2+res_vec3
+        if not isinstance(obj, Vector):
+            raise EngineException(EngineException.WRONG_USAGE)
+
+        else:
+            if not (self.size == 3 and obj.size == 3):
+                raise EngineException(EngineException.WRONG_SIZE)
+
+            else:
+                v1 = Vector([1, 0, 0])
+                v2 = Vector([0, 1, 0])
+                v3 = Vector([0, 0, 1])
+                m = Matrix([[v1, v2, v3], self.values, obj.values])
+                return m.determinant()
 
     def __add__(self, obj: 'Vector'):
         if not (isinstance(self, Vector) and isinstance(obj, Vector)):
@@ -379,11 +410,6 @@ def BilinearForm(matrix: Matrix, vec1: Vector, vec2: Vector):
             sum += matrix[i][j]*vec1[i]*vec2[j]
     return sum
 
-def vector_product(vec1: 'Vector', vec2: 'Vector'):
-        return Vector([vec1[1]*vec2[2] - vec1[2]*vec2[1],
-                       vec1[2]*vec2[0] - vec1[0]*vec2[2],
-                       vec1[0]*vec2[1] - vec1[1]*vec2[0]])
-
 class Point(Vector):
     def __add__(self, vector: Vector):
         if not isinstance(vector, Vector):
@@ -431,6 +457,26 @@ class VectorSpace:
             vec2 = vec2.transpose()
 
         return (vec1.as_matrix() * Matrix.gram(self.basis) * vec2.as_matrix())[0][0]
+    
+    def vector_product(self, vec1: Vector, vec2: Vector):
+        if not isinstance(vec2, Vector):
+            raise EngineException(EngineException.WRONG_USAGE)
+
+        else:
+            if not (vec1.size == 3 and vec2.size == 3):
+                raise EngineException(EngineException.WRONG_SIZE)
+
+            else:
+                basis_v1 = Vector(self.basis[0])
+                basis_v2 = Vector(self.basis[1])
+                basis_v3 = Vector(self.basis[2])
+                
+                v1 = basis_v2**basis_v3
+                v2 = basis_v3**basis_v1
+                v3 = basis_v1**basis_v2
+                
+                m = Matrix([[v1, v2, v3], vec1.values, vec2.values])
+                return m.determinant()
     
     def as_vector(self, point: Point):
         if point.size != self.size:

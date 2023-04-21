@@ -410,7 +410,7 @@ class TestVector:
         
     def testVectorProductExceptiot(self):
         v1 = Vector([1, 2, 3])
-        v2 = Vector([1, 2, 4, 5])\
+        v2 = Vector([1, 2, 4, 5])
             
         with pytest.raises(EngineException):
             act = v1*v2

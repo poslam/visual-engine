@@ -139,4 +139,4 @@ globals.coord_system = cs
 # # act = (v.as_matrix() == [[2], [3], [4]])
 # print(v2.as_matrix() == Matrix([[1, 2, 3]]))
 
-print(v1**v2)
+# print(v1**v2)
