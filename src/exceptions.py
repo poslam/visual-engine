@@ -8,3 +8,6 @@ class EngineException(Exception):
 class MatrixException(EngineException):   
     QUADRATIC_MATRIX = "this operation suports only quadratic matrices"
     SINGULAR_MATRIX = "this operation supports only matrices with determinant not equal to zero"
+    
+class GameException(Exception):
+    PROPERTY_GET_ERROR = "property doesn't exist"

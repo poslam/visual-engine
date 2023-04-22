@@ -6,8 +6,9 @@ import pytest
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(SCRIPT_DIR))
 
-from src.classes import *
 import src.globals as globals
+from src.classes.math import (CoordinateSystem, EngineException, Matrix, Point,
+                              Vector, VectorSpace)
 
 
 class TestMatrix:
