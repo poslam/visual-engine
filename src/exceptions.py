@@ -10,4 +10,5 @@ class MatrixException(EngineException):
     SINGULAR_MATRIX = "this operation supports only matrices with determinant not equal to zero"
     
 class GameException(Exception):
-    PROPERTY_GET_ERROR = "property doesn't exist"
+    NOT_FOUND_ERROR = lambda x: f"{x} doesn't exist"
+    COLLISION_ERROR = "engine has a collision with entities id's"

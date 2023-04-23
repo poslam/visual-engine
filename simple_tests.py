@@ -1,4 +1,5 @@
 from src.classes.math import *
+from src.classes.game import *
 import src.globals as globals
 
 globals.init()
@@ -21,6 +22,14 @@ cs = CoordinateSystem(p1, vs)
 globals.coord_system = cs
 
 
-d = {"id": 1, "name": "xuz"}
-x = d.__getattribute__("keys")
-print(x)
+ent1 = Engine.Entity(cs)
+ent2 = Engine.Entity(cs)
+ent_l = Engine.EntityList([ent1, ent2])
+
+# ent1['pr1'] = 1
+# ent2['pr2'] = 2345
+# ent2['pr3'] = 234
+
+print(ent_l[ent1.id])
+
+# print(ent_l.exec(lambda x: x.properties))
