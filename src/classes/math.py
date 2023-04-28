@@ -300,6 +300,9 @@ class Vector(Matrix):
         self.values = self.transpose().as_matrix().rotate(
             axes_indecies, angle).transpose().data
         return self
+    
+    def norm(self):
+        return self/self.len()
 
     def __scalar_product(self, obj: 'Vector'):
         if self.size != obj.size:
@@ -440,6 +443,12 @@ class VectorSpace:
             vec2 = vec2.transpose()
 
         return (vec1.as_matrix() * Matrix.gram(self.basis) * vec2.as_matrix())[0][0]
+    
+    def len(self, vec: Vector):
+        return self.vector_product(vec, vec)**0.5
+    
+    def norm(self, vec: Vector):
+        return vec/VectorSpace.len(self, vec)
 
     def vector_product(self, vec1: Vector, vec2: Vector):
         if not isinstance(vec2, Vector):

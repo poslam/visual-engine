@@ -21,7 +21,6 @@ class Engine:
             return self.value
 
         def __generate__():
-            globals.num_of_entities += 1
             id = str(hashlib.md5(
                 bytes(str(datetime.utcnow()), 'UTF-8')).digest())[2:-2]
             return id
@@ -92,6 +91,8 @@ class Engine:
             self.cs = cs
             self.entities = entities
             
+            globals.cs = cs
+            
         def run(self):
             pass
         
@@ -101,12 +102,35 @@ class Engine:
         def exit(self):
             pass
         
-        def get_entity_class(self):
-            return Engine.Entity(self.cs)
+        def get_entity():
+            return Engine.Entity(globals.cs)
             
-        def get_ray_class(self):
-            return Engine.Ray(self.cs)
+        def get_ray():
+            return Engine.Ray(globals.cs)
         
         class Object:
             def __init__(self, position: Point, direction: Vector):
+                self.entity = Engine.Game.get_entity()
+                self.entity.set_property("position", position)
+                self.entity.set_property("direction", direction.norm())
+                
+            def move(self, direction: Vector):
                 pass
+            
+            def planar_rotate(self, inds: list[int], angle: float):
+                pass
+            
+            def rotate_3d(self, angles: list[float]):
+                pass
+            
+            def set_position(self, position: Point):
+                self.entity.set_property("position", position)
+                
+            def set_direction(self, direction: Vector):
+                self.entity.set_property("direction", globals.cs.vs.norm(direction))
+                
+            
+                
+        
+                
+                

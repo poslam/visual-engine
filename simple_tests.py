@@ -30,6 +30,5 @@ ent_l = Engine.EntityList([ent1, ent2])
 # ent2['pr2'] = 2345
 # ent2['pr3'] = 234
 
-print(ent_l[ent1.id])
-
-# print(ent_l.exec(lambda x: x.properties))
+x = Engine.Game(cs, ent_l)
+obj = x.Object(p1, v1)
