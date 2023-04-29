@@ -393,6 +393,11 @@ class TestVector:
         v1 = Vector([1, 2, 3])
         v2 = Vector([1, 2, 4])
         
+        vs = VectorSpace([Vector([1, 0, 0]), Vector([0, 1, 0]), Vector([0, 0, 1])])
+        p1 = Point([0, 0, 0])
+        cs = CoordinateSystem(p1, vs)
+        globals.cs = cs
+        
         act = (v1&v2 == 17)
         
         assert act
@@ -403,13 +408,13 @@ class TestVector:
         vs = VectorSpace([Vector([1, 0, 0]), Vector([0, 1, 0]), Vector([0, 0, 1])])
         p1 = Point([0, 0, 0])
         cs = CoordinateSystem(p1, vs)
-        globals.coord_system = cs
+        globals.cs = cs
         
         act = (v1**v2 == Vector([2, -1, 0]))
         
         assert act
         
-    def testVectorProductExceptiot(self):
+    def testVectorProductException(self):
         v1 = Vector([1, 2, 3])
         v2 = Vector([1, 2, 4, 5])
             
@@ -449,8 +454,23 @@ class TestVector:
         
     def testLen(self):
         v1 = Vector([1, 2, 3])
+        vs = VectorSpace([Vector([1, 0, 0]), Vector([0, 1, 0]), Vector([0, 0, 1])])
+        p1 = Point([0, 0, 0])
+        cs = CoordinateSystem(p1, vs)
+        globals.cs = cs
         
-        act = (v1.len() == 14**0.5 )
+        act = (v1.len() == 14**0.5)
+        
+        assert act
+        
+    def testNorm(self):
+        v1 = Vector([1, 2, 3])
+        vs = VectorSpace([Vector([1, 0, 0]), Vector([0, 1, 0]), Vector([0, 0, 1])])
+        p1 = Point([0, 0, 0])
+        cs = CoordinateSystem(p1, vs)
+        globals.cs = cs
+        
+        act = (v1.norm().len() == 1)
         
         assert act
         
@@ -495,15 +515,6 @@ class TestPoint:
     
 
 class TestVectorSpace:
-    def testScalarProduct(self):
-        vs = VectorSpace([Vector([1, 0, 0]), Vector([0, 1, 0]), Vector([0, 0, 1])])
-        v1 = Vector([1, 2, 3])
-        v2 = Vector([1, 2, 4])
-        
-        act = (vs.scalar_product(v1, v2) == v1&v2)
-        
-        assert act
-
     def testAsVector(self):
         vs = VectorSpace([Vector([1, 0, 0]), Vector([0, 1, 0]), Vector([0, 0, 1])])
         p = Point([1, 2, 3])

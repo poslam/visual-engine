@@ -1,8 +1,8 @@
 from math import cos, pi, sin
 from typing import Union
 
-from src.exceptions import EngineException, MatrixException
 import src.globals as globals
+from src.exceptions import EngineException, MatrixException
 
 
 @property
@@ -227,7 +227,7 @@ class Matrix:
         return self + (obj*(-1))
 
     def __getitem__(self, key: int):
-        return self.data[key]
+        return Vector(self.data[key])
 
     def __setitem__(self, key: int, item):
         self.data[key] = item
@@ -300,18 +300,25 @@ class Vector(Matrix):
         self.values = self.transpose().as_matrix().rotate(
             axes_indecies, angle).transpose().data
         return self
-    
+
     def norm(self):
         return self/self.len()
 
-    def __scalar_product(self, obj: 'Vector'):
-        if self.size != obj.size:
-            raise EngineException(EngineException.WRONG_SIZE)
+    def copy(self):
+        return Vector(self.as_matrix().copy())
 
-        identity = Matrix.identity_matrix(self.size)
-        return BilinearForm(identity, self, obj)
+    def __scalar_product(vec1: 'Vector', vec2: 'Vector'):
+        vs = globals.cs.vs
 
-    def __vector_product(self, obj: 'Vector'):
+        if vec1.is_transposed:
+            vec1 = vec1.copy().transpose()
+
+        if not vec2.is_transposed:
+            vec2 = vec2.copy().transpose()
+
+        return (vec1.as_matrix() * Matrix.gram(vs.basis) * vec2.as_matrix())[0][0]
+
+    def __additional_vec_prod(self, obj: 'Vector'):
         if not isinstance(obj, Vector):
             raise EngineException(EngineException.WRONG_USAGE)
 
@@ -324,6 +331,28 @@ class Vector(Matrix):
                 v2 = Vector([0, 1, 0])
                 v3 = Vector([0, 0, 1])
                 m = Matrix([[v1, v2, v3], self.values, obj.values])
+                return m.determinant()
+
+    def __vector_product(vec1, vec2: 'Vector'):
+        if not isinstance(vec2, Vector):
+            raise EngineException(EngineException.WRONG_USAGE)
+
+        else:
+            if not (vec1.size == 3 and vec2.size == 3):
+                raise EngineException(EngineException.WRONG_SIZE)
+
+            else:
+                vs = globals.cs.vs
+
+                basis_v1 = Vector(vs.basis[0])
+                basis_v2 = Vector(vs.basis[1])
+                basis_v3 = Vector(vs.basis[2])
+
+                v1 = basis_v2.__additional_vec_prod(basis_v3)
+                v2 = basis_v3.__additional_vec_prod(basis_v1)
+                v3 = basis_v1.__additional_vec_prod(basis_v2)
+
+                m = Matrix([[v1, v2, v3], vec1.values, vec2.values])
                 return m.determinant()
 
     def __add__(self, obj: 'Vector'):
@@ -373,11 +402,15 @@ class Vector(Matrix):
         if self.is_transposed == False:
             return self.values[key]
         return self.values[key][0]
+    
+    def __setitem__(self, key: int, item):
+        if self.is_transposed == False:
+            self.values[key] = item
+        else:
+            self.values[key][0] = item
 
     zero_matrix = restricted
     identity_matrix = restricted
-    copy = restricted
-    __setitem__ = restricted
     determinant = restricted
     inverse = restricted
     gram = restricted
@@ -435,40 +468,40 @@ class VectorSpace:
         self.basis = matrix
         self.size = len(basis)
 
-    def scalar_product(self, vec1: Vector, vec2: Vector):
-        if vec1.is_transposed:
-            vec1 = vec1.transpose()
+    # def scalar_product(self, vec1: Vector, vec2: Vector):
+    #     if vec1.is_transposed:
+    #         vec1 = vec1.transpose()
 
-        if not vec2.is_transposed:
-            vec2 = vec2.transpose()
+    #     if not vec2.is_transposed:
+    #         vec2 = vec2.transpose()
 
-        return (vec1.as_matrix() * Matrix.gram(self.basis) * vec2.as_matrix())[0][0]
-    
-    def len(self, vec: Vector):
-        return self.vector_product(vec, vec)**0.5
-    
-    def norm(self, vec: Vector):
-        return vec/VectorSpace.len(self, vec)
+    #     return (vec1.as_matrix() * Matrix.gram(self.basis) * vec2.as_matrix())[0][0]
 
-    def vector_product(self, vec1: Vector, vec2: Vector):
-        if not isinstance(vec2, Vector):
-            raise EngineException(EngineException.WRONG_USAGE)
+    # def len(self, vec: Vector):
+    #     return self.vector_product(vec, vec)**0.5
 
-        else:
-            if not (vec1.size == 3 and vec2.size == 3):
-                raise EngineException(EngineException.WRONG_SIZE)
+    # def norm(self, vec: Vector):
+    #     return vec/VectorSpace.len(self, vec)
 
-            else:
-                basis_v1 = Vector(self.basis[0])
-                basis_v2 = Vector(self.basis[1])
-                basis_v3 = Vector(self.basis[2])
+    # def vector_product(self, vec1: Vector, vec2: Vector):
+    #     if not isinstance(vec2, Vector):
+    #         raise EngineException(EngineException.WRONG_USAGE)
 
-                v1 = basis_v2**basis_v3
-                v2 = basis_v3**basis_v1
-                v3 = basis_v1**basis_v2
+    #     else:
+    #         if not (vec1.size == 3 and vec2.size == 3):
+    #             raise EngineException(EngineException.WRONG_SIZE)
 
-                m = Matrix([[v1, v2, v3], vec1.values, vec2.values])
-                return m.determinant()
+    #         else:
+    #             basis_v1 = Vector(self.basis[0])
+    #             basis_v2 = Vector(self.basis[1])
+    #             basis_v3 = Vector(self.basis[2])
+
+    #             v1 = basis_v2**basis_v3
+    #             v2 = basis_v3**basis_v1
+    #             v3 = basis_v1**basis_v2
+
+    #             m = Matrix([[v1, v2, v3], vec1.values, vec2.values])
+    #             return m.determinant()
 
     def as_vector(self, point: Point):
         if point.size != self.size:

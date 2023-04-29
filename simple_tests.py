@@ -17,18 +17,27 @@ v4 = Vector([[0], [0], [1]])
 vs = VectorSpace([Vector([1, 0, 0]), Vector([0, 1, 0]), Vector([0, 0, 1])])
 
 p1 = Point([0, 0, 0])
+p2 = Point([2.543245345, 33.12341234, 1.1231231])
 
 cs = CoordinateSystem(p1, vs)
-globals.coord_system = cs
+globals.cs = cs
 
 
-ent1 = Engine.Entity(cs)
-ent2 = Engine.Entity(cs)
-ent_l = Engine.EntityList([ent1, ent2])
+ent1 = Entity(cs)
+ent2 = Entity(cs)
+ent_l = EntityList([ent1, ent2])
 
-# ent1['pr1'] = 1
-# ent2['pr2'] = 2345
-# ent2['pr3'] = 234
+ent1['pr1'] = 1
+ent2['pr2'] = 2345
+ent2['pr3'] = 234
 
-x = Engine.Game(cs, ent_l)
+x = Game(cs, ent_l)
 obj = x.Object(p1, v1)
+
+obj.set_direction(v1)
+
+
+cam = x.Camera(p2, v1, 2.4555556, 30)
+# print(cam.entity.properties)
+
+print(type(m1[1]))
