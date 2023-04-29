@@ -162,7 +162,7 @@ class Matrix:
         for i in range(self.rows):
             for j in range(self.columns):
                 result[i][j] = BilinearForm(
-                    identity, Vector(self[i]), Vector(self[j]))
+                    identity, self[i], self[j])
         return result
 
     def transpose(self):
@@ -189,6 +189,32 @@ class Matrix:
 
         self.data = (self * rotation_matrix).data
         return self
+    
+    def rotate_3d(self, angles: list[Union[int, float]]):
+        if self.columns == 2:
+            angle = angles[0]*pi/180
+            rotation_matrix = Matrix([[cos(angle), -sin(angle)],
+                                      [sin(angle), cos(angle)]])
+            self.data = (self * rotation_matrix).data
+            return self
+        
+        if self.columns == 3:
+            angle_x, angle_y, angle_z = angles[0]*pi/180, angles[1]*pi/180, angles[2]*pi/180
+            rotation_matrix_x = Matrix([[1, 0, 0],
+                                        [0, cos(angle_x), -sin(angle_x)],
+                                        [0, sin(angle_x), cos(angle_x)]])
+            rotation_matrix_y = Matrix([[cos(angle_y), 0, -sin(angle_y)],
+                                        [0, 1, 0],
+                                        [sin(angle_y), 0, cos(angle_y)]])
+            rotation_matrix_z = Matrix([[cos(angle_z), -sin(angle_z), 0],
+                                        [sin(angle_z), cos(angle_z), 0],
+                                        [0, 0, 1]])
+            self.data = (self * rotation_matrix_x *
+                         rotation_matrix_y * rotation_matrix_z).data
+            return self
+        
+        else:
+            raise EngineException(EngineException.DIMENSION_ERROR(3))
 
     def rank(self):
         if self.rows != self.columns:
@@ -254,7 +280,11 @@ class Vector(Matrix):
     def __init__(self, values: Union[list[float], list[list[float]], Matrix]):
         if not isinstance(values, list) and not isinstance(values, Matrix):
             raise EngineException(EngineException.WRONG_USAGE)
-
+        
+        if isinstance(values[0], Vector):   # Vector([Vector])
+            self.is_transposed = False
+            self.values = [x for x in values]
+            
         if isinstance(values, Matrix):
             if 1 not in (values.rows, values.columns):
                 raise EngineException(EngineException.WRONG_SIZE)
@@ -300,6 +330,11 @@ class Vector(Matrix):
         self.values = self.transpose().as_matrix().rotate(
             axes_indecies, angle).transpose().data
         return self
+    
+    def rotate_3d(self, angles: list[Union[int, float]]):
+        temp = Vector(self.as_matrix().rotate_3d(angles))
+        self.values = temp.values
+        return self
 
     def norm(self):
         return self/self.len()
@@ -322,16 +357,14 @@ class Vector(Matrix):
         if not isinstance(obj, Vector):
             raise EngineException(EngineException.WRONG_USAGE)
 
-        else:
-            if not (self.size == 3 and obj.size == 3):
-                raise EngineException(EngineException.WRONG_SIZE)
+        if not (self.size == 3 and obj.size == 3):
+            raise EngineException(EngineException.WRONG_SIZE)
 
-            else:
-                v1 = Vector([1, 0, 0])
-                v2 = Vector([0, 1, 0])
-                v3 = Vector([0, 0, 1])
-                m = Matrix([[v1, v2, v3], self.values, obj.values])
-                return m.determinant()
+        v1 = Vector([1, 0, 0])
+        v2 = Vector([0, 1, 0])
+        v3 = Vector([0, 0, 1])
+        m = Matrix([[v1, v2, v3], self.values, obj.values])
+        return m.determinant()
 
     def __vector_product(vec1, vec2: 'Vector'):
         if not isinstance(vec2, Vector):
@@ -344,9 +377,9 @@ class Vector(Matrix):
             else:
                 vs = globals.cs.vs
 
-                basis_v1 = Vector(vs.basis[0])
-                basis_v2 = Vector(vs.basis[1])
-                basis_v3 = Vector(vs.basis[2])
+                basis_v1 = Vector(vs.basis[0].values)
+                basis_v2 = Vector(vs.basis[1].values)
+                basis_v3 = Vector(vs.basis[2].values)
 
                 v1 = basis_v2.__additional_vec_prod(basis_v3)
                 v2 = basis_v3.__additional_vec_prod(basis_v1)

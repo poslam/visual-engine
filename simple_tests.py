@@ -1,5 +1,5 @@
+from src.classes.engine import Entity, EntityList, Game
 from src.classes.math import *
-from src.classes.game import *
 import src.globals as globals
 
 globals.init()
@@ -30,14 +30,91 @@ ent_l = EntityList([ent1, ent2])
 ent1['pr1'] = 1
 ent2['pr2'] = 2345
 ent2['pr3'] = 234
+print(ent1.pr1)
+ent1.pr1 = 2
+ent1.set_property("pr1", 4)
+print(ent1.pr1)
 
-x = Game(cs, ent_l)
-obj = x.Object(p1, v1)
+# print(globals.identifiers)
 
-obj.set_direction(v1)
+class NewEntity:
+    def __init__(self):
+        self.__dict__["properties"] = set()
+        
+    def get_property(self, prop: str, default = None):
+        if prop not in self.__dict__["properties"]:
+            return default
 
+        return self.__dict__[prop]
+    
+    def set_property(self, prop: str, value: any):
+        if prop == "properties":
+            raise Exception
+        
+        self.__dict__[prop] = value
+        self.__dict__["properties"].add(prop)
+        
+    def remove_property(self, prop):
+        if prop == "properties":
+            raise Exception
+        
+        self.__delattr__(prop)
+        self.__dict__["properties"].remove(prop)
+        
+    def __getitem__(self, prop):
+        return self.get_property(prop)
+    
+    def __setitem__(self, prop, value):
+        self.set_property(prop, value)
+   
+    def __getattr__(self, prop):
+        return self.get_property(prop)
+   
+    def __setattr__(self, prop, value):
+        self.set_property(prop, value)
+        
+    
+x = NewEntity()
 
-cam = x.Camera(p2, v1, 2.4555556, 30)
-# print(cam.entity.properties)
+print()
+print(x.val1)
+print(x["val1"])
+print(x.get_property("val1"))
 
-print(type(m1[1]))
+x.val1 = "Cringe"
+
+print()
+print(x.val1)
+print(x["val1"])
+print(x.get_property("val1"))
+
+x["val1"] = "Oh no"
+
+print()
+print(x.val1)
+print(x["val1"])
+print(x.get_property("val1"))
+
+x.set_property("val1", "Welcum")
+
+print()
+print(x.val1)
+print(x["val1"])
+print(x.get_property("val1"))
+
+x.val2 = "1e"
+
+print()
+print(x.val2)
+print(x["val2"])
+print(x.get_property("val2"))
+
+print(x.properties)
+
+x.remove_property("val2")
+print(x.properties)
+
+print()
+print(x.val2)
+print(x["val2"])
+print(x.get_property("val2"))
