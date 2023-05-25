@@ -9,11 +9,13 @@ import src.globals as globals
 
 
 class Game:
-    def __init__(self, cs: CoordinateSystem, entities: 'EntityList'):
+    def __init__(self, cs: CoordinateSystem, entities: EntityList):
+        if not (isinstance(cs, CoordinateSystem) and\
+                        isinstance(entities, EntityList)):
+                    raise EngineException(EngineException.WRONG_INPUT)
+        
         self.cs = cs
         self.entities = entities
-
-        globals.cs = cs
 
     def run(self):
         pass
@@ -40,43 +42,47 @@ class Game:
 
     def get_object(self):
         class GameObject(self.get_entity()):
-            def __init__(self, position: Point, direction: Vector = None):
+            def __init__(self, position: Point, direction: Union(Vector, list[int, float])):
+                if not (isinstance(position, Point) and\
+                        isinstance(direction, (Vector, list))):
+                    raise EngineException(EngineException.WRONG_INPUT)
+                
                 position = Point([round(x, globals.precision) for x in position.values])
-                if isinstance(direction, Vector):
-                    direction = Vector([round(x, globals.precision)
-                                    for x in direction.norm().values])
+                direction = Vector([round(x, globals.precision)
+                                for x in direction.norm().values])
 
-                self.entity = Game.get_entity()
-                self.entity.set_property("position", position)
-                self.entity.set_property("direction", direction)
+                self.set_property("position", position)
+                self.set_property("direction", direction)
 
             def move(self, direction: Vector):
-                self.entity["position"] = self.entity["position"] + direction
+                self["position"] = self["position"] + direction
 
             def planar_rotate(self, inds: list[int], angle: float):
-                if not isinstance(self.entity["direction"], Vector):
+                if not isinstance(self["direction"], Vector):
                     raise EngineException(EngineException.DIRECTION_ERROR)
                 
-                direction = self.entity["direction"]
+                direction = self["direction"]
                 self.set_direction(direction.rotate(inds, angle))
 
             def rotate_3d(self, angles: list[Union[int, float]]):
-                if not isinstance(self.entity["direction"], Vector):
+                if not isinstance(self["direction"], Vector):
                     raise EngineException(EngineException.DIRECTION_ERROR)
                 
-                direction = self.entity["direction"]
+                direction = self["direction"]
                 self.set_direction(direction.rotate_3d(angles))
 
             def set_position(self, position: Point):
                 position = Point([round(x, globals.precision) for x in position.values])
 
-                self.entity.set_property("position", position)
+                self.set_property("position", position)
 
             def set_direction(self, direction: Vector):
                 direction = Vector([round(x, globals.precision)
                                 for x in direction.norm().values])
 
-                self.entity.set_property("direction", direction)
+                self.set_property("direction", direction)
+                
+        return GameObject
         
     def get_camera(self):
         class GameCamera(self.get_object()):
@@ -92,10 +98,9 @@ class Game:
                 vfov = round(2/3*fov, globals.precision)
                 draw_distance = round(draw_distance, globals.precision)
 
-                self.entity.set_property("fov", fov)
+                self.set_property("fov", fov)
                 if vfov == None:
-                    # self.entity.set_property("vfov", vfov)
                     pass
                 else:
-                    self.entity.set_property("vfov", vfov)
-                self.entity.set_property("draw_distance", draw_distance)
+                    self.set_property("vfov", vfov)
+                self.set_property("draw_distance", draw_distance)

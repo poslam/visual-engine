@@ -1,3 +1,4 @@
+from lib.engine.basic import Entity
 from lib.math.cs import CoordinateSystem
 from lib.math.matrix_vector import Vector
 from lib.math.point import Point
@@ -7,55 +8,51 @@ import src.globals as globals
 vs = VectorSpace([Vector([1, 0, 0]), Vector([0, 1, 0]), Vector([0, 0, 1])])
 p1 = Point([0, 0, 0])
 cs = CoordinateSystem(p1, vs)
-globals.cs = cs
-
-
-# print(globals.identifiers)
-
-
-        
+globals.cs = cs  
     
-# x = NewEntity()
+x = Entity(cs)
 
-# print()
-# print(x.val1)
-# print(x["val1"])
-# print(x.get_property("val1"))
+print(x.get_property("id"))
 
-# x.val1 = "Cringe"
+print()
+print(x.val1)
+print(x["val1"])
+print(x.get_property("val1"))
 
-# print()
-# print(x.val1)
-# print(x["val1"])
-# print(x.get_property("val1"))
+x.val1 = "Cringe"
 
-# x["val1"] = "Oh no"
+print()
+print(x.val1)
+print(x["val1"])
+print(x.get_property("val1"))
 
-# print()
-# print(x.val1)
-# print(x["val1"])
-# print(x.get_property("val1"))
+x["val1"] = "Oh no"
 
-# x.set_property("val1", "Welcum")
+print()
+print(x.val1)
+print(x["val1"])
+print(x.get_property("val1"))
 
-# print()
-# print(x.val1)
-# print(x["val1"])
-# print(x.get_property("val1"))
+x.set_property("val1", "Welcum")
 
-# x.val2 = "1e"
+print()
+print(x.val1)
+print(x["val1"])
+print(x.get_property("val1"))
 
-# print()
-# print(x.val2)
-# print(x["val2"])
-# print(x.get_property("val2"))
+x.val2 = "1e"
 
-# print(x.properties)
+print()
+print(x.val2)
+print(x["val2"])
+print(x.get_property("val2"))
 
-# x.remove_property("val2")
-# print(x.properties)
+print(x.properties)
 
-# print()
-# print(x.val2)
-# print(x["val2"])
-# print(x.get_property("val2"))
+x.remove_property("val2")
+print(x.properties)
+
+print()
+print(x.val2)
+print(x["val2"])
+print(x.get_property("val2"))

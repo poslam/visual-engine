@@ -1,13 +1,13 @@
 import os
 import sys
 
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.dirname(SCRIPT_DIR))
+
 import pytest
 from lib.math.cs import CoordinateSystem
 from lib.math.point import Point
 from lib.math.vs import VectorSpace
-
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.dirname(SCRIPT_DIR))
 
 import src.globals as globals
 from lib.math.matrix_vector import Matrix, Vector
