@@ -4,3 +4,6 @@ def init():
     
     global identifiers
     identifiers = set()
+    
+    global precision
+    precision = 4

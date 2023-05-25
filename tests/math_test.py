@@ -2,13 +2,16 @@ import os
 import sys
 
 import pytest
+from lib.math.cs import CoordinateSystem
+from lib.math.point import Point
+from lib.math.vs import VectorSpace
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(SCRIPT_DIR))
 
 import src.globals as globals
-from src.classes.math import (CoordinateSystem, EngineException, Matrix, Point,
-                              Vector, VectorSpace)
+from lib.math.matrix_vector import Matrix, Vector
+from lib.exceptions.math_exc import MathException
 
 
 class TestMatrix:
@@ -20,7 +23,7 @@ class TestMatrix:
         assert act
         
     def testExceptionRectangularMatrixInInit(self):
-        with pytest.raises(EngineException):
+        with pytest.raises(MathException):
             act = Matrix([[1, 2], [3]])
 
     def testDataIsList(self):
@@ -136,13 +139,13 @@ class TestMatrix:
         m1 = Matrix([[1, 2], [3, 4]])
         m2 = Matrix([[1, 2, 3], [2, 3, 1], [5, 1, 0]])
         
-        with pytest.raises(EngineException):
+        with pytest.raises(MathException):
             act = m1+m2
         
     def testAdditionExceptionWrongUsage(self):
         m = Matrix([[1, 2], [3, 4]])
         
-        with pytest.raises(EngineException):
+        with pytest.raises(MathException):
             act = m+3
             
     def testCopy(self):
@@ -156,7 +159,7 @@ class TestMatrix:
         m1 = Matrix([[1, 2], [3, 4]])
         m2 = Matrix([[1, 2, 3], [2, 3, 1], [5, 1, 0]])
         
-        with pytest.raises(EngineException):
+        with pytest.raises(MathException):
             act = m1*m2
             
     def testProductOutType(self):
@@ -257,7 +260,7 @@ class TestMatrix:
     def testDivisionExceptionNotCommutative(self):
         m = Matrix([[1, 2], [3, 4]])
         
-        with pytest.raises(EngineException):
+        with pytest.raises(MathException):
             act = 2/m
             
     def testRotate(self):
@@ -334,7 +337,7 @@ class TestVector:
         assert act
         
     def testInitializeExceptionWrongSize(self):
-        with pytest.raises(EngineException):
+        with pytest.raises(MathException):
             act = Vector([[2, 1], [1], [1]])
         
     def testTranspose(self):
@@ -380,13 +383,13 @@ class TestVector:
         v1 = Vector([1, 2, 3])
         v2 = Vector([1, 2, 3, 4])
         
-        with pytest.raises(EngineException):
+        with pytest.raises(MathException):
             act = v1 + v2
             
     def testAdditionExceptionWrongSize(self):
         v1 = Vector([1, 2, 3])
         
-        with pytest.raises(EngineException):
+        with pytest.raises(MathException):
             act = v1 + 2
             
     def testScalarProduct(self):
@@ -418,7 +421,7 @@ class TestVector:
         v1 = Vector([1, 2, 3])
         v2 = Vector([1, 2, 4, 5])
             
-        with pytest.raises(EngineException):
+        with pytest.raises(MathException):
             act = v1*v2
             
     def testMultiplyWithScalar(self):
@@ -480,6 +483,13 @@ class TestVector:
         act = (v.rotate([0, 1], 90) == Vector([-2, 1, 3]))
         
         assert act
+        
+    def testDivByConst(self):
+        v = Vector([1, 2, 3])
+        
+        act = (v/2 == Vector([0.5, 1, 1.5]))
+        
+        assert act
     
 
 class TestPoint:
@@ -502,7 +512,7 @@ class TestPoint:
     def testAdditionException(self):
         p = Point([1, 1, 1])   
          
-        with pytest.raises(EngineException):
+        with pytest.raises(MathException):
             act = p+1
             
     def testSubtraction(self):
