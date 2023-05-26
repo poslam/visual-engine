@@ -35,7 +35,6 @@ class Identifier:
 
     def __init__(self):
         self.id = self.__generate_id__()
-        globals.identifiers.add(self.id)
 
 
 class Entity:
@@ -46,7 +45,8 @@ class Entity:
 
     def get_property(self, prop: str):
         if prop not in self.__dict__["properties"]:
-            raise EngineException(EngineException.NOT_FOUND_ERROR(f"property {prop}"))
+            raise EngineException(
+                EngineException.NOT_FOUND_ERROR(f"property {prop}"))
 
         return self.__dict__[prop]
 
@@ -89,7 +89,8 @@ class EntityList:
             if en.id == entity_id:
                 self.entities.remove(en)
             else:
-                raise EngineException(EngineException.NOT_FOUND_ERROR("entity"))
+                raise EngineException(
+                    EngineException.NOT_FOUND_ERROR("entity"))
 
     def get(self, id: Identifier):
         entity = [entity for entity in self.entities
@@ -101,12 +102,9 @@ class EntityList:
 
         return entity[0]
 
-    def exec(self, func: callable):
-        if len(self.entities) == 0:
-            raise EngineException(EngineException.NOT_FOUND_ERROR("entities"))
-
-        self.entities = list(map(lambda obj: func(obj), self.entities))
-        return self
+    def exec(self, f, *args, **kwargs):
+        for i in self.entities:
+            f(i, *args, **kwargs)
 
     def __getitem__(self, id: Identifier):
         return self.get(id)

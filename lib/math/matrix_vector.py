@@ -281,7 +281,7 @@ class Matrix:
         raise MathException(MathException.WRONG_USAGE)
 
 
-class Vector:
+class Vector(Matrix):
     def __init__(self, values: Union[list[float], list[list[float]], Matrix]):
         if not isinstance(values, list) and not isinstance(values, Matrix):
             raise MathException(MathException.WRONG_USAGE)
@@ -325,7 +325,7 @@ class Vector:
         self.is_transposed = not (self.is_transposed)
         return self
 
-    def len(self):
+    def len(self) -> Union[int, float]:
         return (self & self)**0.5
 
     def rotate(self, axes_indecies: list[int], angle: float):

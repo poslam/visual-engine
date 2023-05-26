@@ -1,11 +1,12 @@
 from math import pi
 from typing import Union
+
+import src.globals as globals
 from lib.engine.basic import Entity, EntityList, Ray
 from lib.exceptions.engine_exc import EngineException
 from lib.math.cs import CoordinateSystem
-from lib.math.point import Point
 from lib.math.matrix_vector import Vector
-import src.globals as globals
+from lib.math.point import Point
 
 
 class Game:
@@ -42,7 +43,8 @@ class Game:
 
     def get_object(self):
         class GameObject(self.get_entity()):
-            def __init__(self, position: Point, direction: Union(Vector, list[int, float])):
+            def __init__(pself, position: Point, direction: Union[Vector, list[int, float]]):
+                super().__init__()
                 if not (isinstance(position, Point) and\
                         isinstance(direction, (Vector, list))):
                     raise EngineException(EngineException.WRONG_INPUT)
@@ -51,8 +53,8 @@ class Game:
                 direction = Vector([round(x, globals.precision)
                                 for x in direction.norm().values])
 
-                self.set_property("position", position)
-                self.set_property("direction", direction)
+                pself.set_property("position", position)
+                pself.set_property("direction", direction)
 
             def move(self, direction: Vector):
                 self["position"] = self["position"] + direction
@@ -89,11 +91,12 @@ class Game:
             def __init__(self, position: Point, draw_distance: float,
                         fov: Union[int, float], direction: Vector = None, vfov: Union[int, float] = None,
                         look_at: Point = None):
+                super().__init__(position, direction)
                 if not isinstance(look_at, Point):
                     super().__init__(position, direction)
                 else:
                     super().__init__(position)
-
+                
                 fov = round(fov*pi/180, globals.precision)
                 vfov = round(2/3*fov, globals.precision)
                 draw_distance = round(draw_distance, globals.precision)

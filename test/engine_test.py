@@ -1,21 +1,23 @@
 import os
 import sys
-
 import pytest
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(SCRIPT_DIR))
 
+from src.game import Game
 from lib.exceptions.engine_exc import EngineException
 from lib.engine.basic import Entity, EntityList
 from lib.math.cs import CoordinateSystem
 from lib.math.matrix_vector import Vector
 from lib.math.point import Point
 from lib.math.vs import VectorSpace
+import src.globals as globals
 
 vs = VectorSpace([Vector([1, 0, 0]), Vector([0, 1, 0]), Vector([0, 0, 1])])
 p1 = Point([0, 0, 0])
 cs = CoordinateSystem(p1, vs)
+globals.cs = cs
 
 class TestEntity:
     def test_set_property1(self):
@@ -91,9 +93,18 @@ class TestEntityList:
     def test_exec(self):
         en_l = EntityList([Entity(cs), Entity(cs)])
         
-        en_l.exec(lambda x: x.set_property("test", "123"), en_l)
-        print(en_l[0])
+        en_l.exec(Entity.set_property, "test", "123")
+        act = all(en_l.entities[i]["test"] == "123" for i in range(len(en_l.entities)))
         
-        # act = all(en.get_property("test") == "123" for en in en_l.entities)
+        assert act
         
-        assert True
+class TestGameObject:
+    def test_move(self):
+        game = Game(cs, EntityList(Entity(cs)))
+        object = game.get_object()(Point([0, 0, 0]), Vector([1, 1, 1]))
+        
+        object.move(Vector([1, 1, 2]))
+        act = (object["position"] == Point([1, 1, 2]))
+
+        assert act
+        
