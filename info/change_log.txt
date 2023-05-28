@@ -1,6 +1,7 @@
 28.05.23
 - починены Vector.rotate(), Vector.rotate_3d()
 - написаны тесты для GameObject, GameCamera
+- сделана документация
 
 26.05.23
 - починены GameObject, GameCamera
