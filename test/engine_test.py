@@ -8,7 +8,7 @@ sys.path.append(os.path.dirname(SCRIPT_DIR))
 
 from src.game import Game
 from lib.exceptions.engine_exc import EngineException
-from lib.engine.basic import Entity, EntityList
+from lib.engine.engine import Entity, EntityList
 from lib.math.cs import CoordinateSystem
 from lib.math.matrix_vector import Vector
 from lib.math.point import Point
@@ -143,10 +143,10 @@ class TestGameCamera:
         camera = game.get_camera()(Point([1, 1, 1]), 15, 10)
         
         act = (camera["position"] == Point([1, 1, 1])) and\
-            (camera["fov"] == round(0.1745329252, globals.precision)) and\
+            (camera["fov"] == round(0.17453292519943295, globals.precision)) and\
                 (camera["draw_distance"] == 15) and\
                     (camera["direction"] == None) and\
-                        (camera["vfov"] == round(0.1163552835, globals.precision)) and\
+                        (camera["vfov"] == round(2/3*camera["fov"], globals.precision)) and\
                             (camera["look_at"] == None)
         
         assert act

@@ -1,8 +1,6 @@
 import hashlib
 from datetime import datetime
-from math import pi
 from random import randint
-from typing import Union
 
 import src.globals as globals
 from lib.exceptions.engine_exc import EngineException
@@ -41,7 +39,7 @@ class Entity:
     def __init__(self, cs: CoordinateSystem):
         self.__dict__["properties"] = set()
         self.cs = cs
-        self.id = Identifier().id
+        self.id = Identifier()
 
     def get_property(self, prop: str):
         if prop not in self.__dict__["properties"]:

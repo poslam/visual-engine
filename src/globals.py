@@ -3,4 +3,4 @@ def init():
     cs = None
     
     global precision
-    precision = 10
+    precision = 3

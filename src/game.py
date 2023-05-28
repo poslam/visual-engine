@@ -2,7 +2,7 @@ from math import pi
 from typing import Union
 
 import src.globals as globals
-from lib.engine.basic import Entity, EntityList, Ray
+from lib.engine.engine import Entity, EntityList, Ray
 from lib.exceptions.engine_exc import EngineException
 from lib.math.cs import CoordinateSystem
 from lib.math.matrix_vector import Vector
