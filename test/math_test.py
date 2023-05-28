@@ -266,7 +266,7 @@ class TestMatrix:
     def testRotate(self):
         m = Matrix([[1, 2], [3, 4]])
         
-        act = (m.rotate([0, 1], 90) == Matrix([[-2, 1], [-4, 3]]))
+        act = (m.rotate([0, 1], 90) == Matrix([[-3, -4], [1, 2]]))
         
         assert act
         

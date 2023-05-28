@@ -1,3 +1,4 @@
+from math import pi
 import os
 import sys
 import pytest
@@ -19,92 +20,133 @@ p1 = Point([0, 0, 0])
 cs = CoordinateSystem(p1, vs)
 globals.cs = cs
 
+
 class TestEntity:
     def test_set_property1(self):
         en = Entity(cs)
-        
+
         en.set_property("Rossiya", "pravoslavno")
         act = (en["Rossiya"] == "pravoslavno")
-        
+
         assert act
-        
+
     def test_get_property1(self):
         en = Entity(cs)
-        
+
         en.set_property("Rossiya", "pravoslavno")
         act = (en["Rossiya"] == "pravoslavno")
-        
-        assert act    
-        
+
+        assert act
+
     def test_set_property2(self):
         en = Entity(cs)
-        
+
         en["Rossiya"] = "pravoslavno"
         act = (en["Rossiya"] == "pravoslavno")
-        
+
         assert act
 
     def test_get_property2(self):
         en = Entity(cs)
         en.set_property("Rossiya", "pravoslavno")
-        
+
         act = (en.get_property("Rossiya") == "pravoslavno")
-        
+
         assert act
-        
+
     def test_remove_property(self):
         en = Entity(cs)
         en.set_property("Rossiya", "pravoslavno")
-        
+
         en.remove_property("Rossiya")
-        
+
         with pytest.raises(EngineException):
             en.get_property("Rossiya")
-        
+
+
 class TestEntityList:
     def test_append(self):
         en_l = EntityList([Entity(cs), Entity(cs)])
-        
+
         en_l.append(Entity(cs))
-        
+
         act = (len(en_l.entities) == 3)
-        
+
         assert act
-        
+
     def test_remove(self):
         en_l = EntityList([Entity(cs), Entity(cs)])
-        
+
         en1 = en_l.entities[0]
         en_l.remove(en1.id)
-        
+
         act = (en1 not in en_l.entities)
-        
+
         assert act
-        
+
     def test_get(self):
         en_l = EntityList([Entity(cs), Entity(cs)])
-        
+
         en1 = en_l.entities[0]
-        
+
         act = (en1 == en_l.get(en1.id))
-        
+
         assert act
-    
+
     def test_exec(self):
         en_l = EntityList([Entity(cs), Entity(cs)])
-        
+
         en_l.exec(Entity.set_property, "test", "123")
-        act = all(en_l.entities[i]["test"] == "123" for i in range(len(en_l.entities)))
-        
+        act = all(en_l.entities[i]["test"] ==
+                  "123" for i in range(len(en_l.entities)))
+
         assert act
-        
+
+
 class TestGameObject:
     def test_move(self):
         game = Game(cs, EntityList(Entity(cs)))
         object = game.get_object()(Point([0, 0, 0]), Vector([1, 1, 1]))
-        
+
         object.move(Vector([1, 1, 2]))
         act = (object["position"] == Point([1, 1, 2]))
 
         assert act
+
+    def test_planar_rotate(self):
+        game = Game(cs, EntityList(Entity(cs)))
+        object = game.get_object()(Point([0, 0, 0]), Vector([2, 1, 3]))
+
+        object.planar_rotate([0, 1], 90)
+
+        test = Vector([round(x, globals.precision)
+                      for x in [-0.2672612419, 0.5345224838, 0.8017837257]])
+        act = (object["direction"] == test)
+
+        assert act
+
+    def test_rotate_3d(self):
+        game = Game(cs, EntityList(Entity(cs)))
+        object = game.get_object()(Point([1, 1, 1]), Vector([2, 1, 0]))
+
+        object.rotate_3d([90, 0, 90])
+
+        act = (object["direction"] == Vector([round(x, globals.precision)
+               for x in [-0.4472135955, 0.0, 0.894427191]]))
+
+        assert act
+
+
+class TestGameCamera:
+    def test_camera(self):
+        game = Game(cs, EntityList(Entity(cs)))
+        camera = game.get_camera()(Point([1, 1, 1]), 15, 10)
         
+        act = (camera["position"] == Point([1, 1, 1])) and\
+            (camera["fov"] == round(0.1745329252, globals.precision)) and\
+                (camera["draw_distance"] == 15) and\
+                    (camera["direction"] == None) and\
+                        (camera["vfov"] == round(0.1163552835, globals.precision)) and\
+                            (camera["look_at"] == None)
+        
+        assert act

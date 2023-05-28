@@ -1,5 +1,9 @@
+28.05.23
+- починены Vector.rotate(), Vector.rotate_3d()
+- написаны тесты для GameObject, GameCamera
+
 26.05.23
-- починены GameObject, GameCamera, 
+- починены GameObject, GameCamera
 
 25.05.23
 - переработан класс Game

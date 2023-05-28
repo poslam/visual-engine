@@ -43,18 +43,25 @@ class Game:
 
     def get_object(self):
         class GameObject(self.get_entity()):
-            def __init__(pself, position: Point, direction: Union[Vector, list[int, float]]):
+            def __init__(pself, position: Point, 
+                         direction: Union[Vector, list[int, float], None] = None):
                 super().__init__()
                 if not (isinstance(position, Point) and\
-                        isinstance(direction, (Vector, list))):
+                        isinstance(direction, Union[Vector, list, None])):
                     raise EngineException(EngineException.WRONG_INPUT)
                 
                 position = Point([round(x, globals.precision) for x in position.values])
-                direction = Vector([round(x, globals.precision)
-                                for x in direction.norm().values])
-
-                pself.set_property("position", position)
-                pself.set_property("direction", direction)
+                
+                if direction == None:
+                    pself.set_direction(None)
+                else:
+                    direction = Vector([round(x, globals.precision)
+                                    for x in direction.norm().values])
+                    
+                    pself.set_direction(direction)
+                    
+                pself.set_position(position)
+                
 
             def move(self, direction: Vector):
                 self["position"] = self["position"] + direction
@@ -63,15 +70,15 @@ class Game:
                 if not isinstance(self["direction"], Vector):
                     raise EngineException(EngineException.DIRECTION_ERROR)
                 
-                direction = self["direction"]
-                self.set_direction(direction.rotate(inds, angle))
+                direction = self["direction"].rotate(inds, angle)
+                self.set_direction(direction)
 
             def rotate_3d(self, angles: list[Union[int, float]]):
                 if not isinstance(self["direction"], Vector):
                     raise EngineException(EngineException.DIRECTION_ERROR)
                 
-                direction = self["direction"]
-                self.set_direction(direction.rotate_3d(angles))
+                direction = self["direction"].rotate_3d(angles)
+                self.set_direction(direction)
 
             def set_position(self, position: Point):
                 position = Point([round(x, globals.precision) for x in position.values])
@@ -79,8 +86,9 @@ class Game:
                 self.set_property("position", position)
 
             def set_direction(self, direction: Vector):
-                direction = Vector([round(x, globals.precision)
-                                for x in direction.norm().values])
+                if direction != None:
+                    direction = Vector([round(x, globals.precision)
+                                    for x in direction.norm().values])
 
                 self.set_property("direction", direction)
                 
@@ -88,22 +96,23 @@ class Game:
         
     def get_camera(self):
         class GameCamera(self.get_object()):
-            def __init__(self, position: Point, draw_distance: float,
-                        fov: Union[int, float], direction: Vector = None, vfov: Union[int, float] = None,
+            def __init__(self, position: Point, draw_distance: Union[int, float],
+                        fov: Union[int, float], direction: Vector = None, 
+                        vfov: Union[int, float] = None,
                         look_at: Point = None):
                 super().__init__(position, direction)
-                if not isinstance(look_at, Point):
-                    super().__init__(position, direction)
-                else:
-                    super().__init__(position)
                 
-                fov = round(fov*pi/180, globals.precision)
-                vfov = round(2/3*fov, globals.precision)
                 draw_distance = round(draw_distance, globals.precision)
+                fov = round(fov*pi/180, globals.precision)
 
-                self.set_property("fov", fov)
                 if vfov == None:
-                    pass
+                    vfov = round(2/3*fov, globals.precision)
                 else:
-                    self.set_property("vfov", vfov)
+                    vfov = round(2/3*vfov, globals.precision)
+                
+                self.set_property("fov", fov)
+                self.set_property("vfov", vfov)
                 self.set_property("draw_distance", draw_distance)
+                self.set_property("look_at", look_at)
+                
+        return GameCamera
