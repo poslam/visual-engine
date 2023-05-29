@@ -22,15 +22,7 @@ globals.cs = cs
 
 
 class TestEntity:
-    def test_set_property1(self):
-        en = Entity(cs)
-
-        en.set_property("Rossiya", "pravoslavno")
-        act = (en["Rossiya"] == "pravoslavno")
-
-        assert act
-
-    def test_get_property1(self):
+    def test_set_get_property1(self):
         en = Entity(cs)
 
         en.set_property("Rossiya", "pravoslavno")
@@ -63,6 +55,22 @@ class TestEntity:
         with pytest.raises(EngineException):
             en.get_property("Rossiya")
 
+    def test_get_property3(self):
+        en = Entity(cs)
+        en.set_property("Rossiya", "pravoslavno")
+        
+        act = (en.Rossiya == "pravoslavno")
+        
+        assert act
+        
+    def test_set_property3(self):
+        en = Entity(cs)
+        en.Rossiya = "pravoslavno"
+        
+        act = (en.Rossiya == "pravoslavno" == en["Rossiya"])
+        
+        assert act
+        
 
 class TestEntityList:
     def test_append(self):
@@ -138,15 +146,49 @@ class TestGameObject:
 
 
 class TestGameCamera:
-    def test_camera(self):
+    def test_camera_init_position(self):
         game = Game(cs, EntityList(Entity(cs)))
         camera = game.get_camera()(Point([1, 1, 1]), 15, 10)
         
-        act = (camera["position"] == Point([1, 1, 1])) and\
-            (camera["fov"] == round(0.17453292519943295, globals.precision)) and\
-                (camera["draw_distance"] == 15) and\
-                    (camera["direction"] == None) and\
-                        (camera["vfov"] == round(2/3*camera["fov"], globals.precision)) and\
-                            (camera["look_at"] == None)
+        act = (camera["position"] == Point([1, 1, 1]))
+        
+        assert act
+        
+    def test_camera_init_fov(self):
+        game = Game(cs, EntityList(Entity(cs)))
+        camera = game.get_camera()(Point([1, 1, 1]), 15, 10)
+        
+        act = (camera["fov"] == round(0.17453292519943295, globals.precision))
+        assert act
+    
+    def test_camera_init_draw_distance(self):
+        game = Game(cs, EntityList(Entity(cs)))
+        camera = game.get_camera()(Point([1, 1, 1]), 15, 10)
+        
+        act = (camera["draw_distance"] == 15)
+        
+        assert act
+    
+    def test_camera_init_direction(self):
+        game = Game(cs, EntityList(Entity(cs)))
+        camera = game.get_camera()(Point([1, 1, 1]), 15, 10)
+        
+        act = (camera["direction"] == None)
+        
+        assert act
+        
+    def test_camera_init_vfov(self):
+        game = Game(cs, EntityList(Entity(cs)))
+        camera = game.get_camera()(Point([1, 1, 1]), draw_distance=15, fov=10)
+        
+        act = (camera["vfov"] == round(2/3*camera["fov"], globals.precision))
+        
+        assert act
+        
+    def test_camera_init_look_at(self):
+        game = Game(cs, EntityList(Entity(cs)))
+        camera = game.get_camera()(Point([1, 1, 1]), 15, 10)
+        
+        act = (camera["look_at"] == None)
         
         assert act
