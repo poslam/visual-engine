@@ -5,7 +5,7 @@ import src.globals as globals
 from lib.engine.engine import Entity, EntityList, Ray
 from lib.exceptions.engine_exc import EngineException
 from lib.math.cs import CoordinateSystem
-from lib.math.matrix_vector import Vector
+from lib.math.matrix_vector import Matrix, Vector
 from lib.math.point import Point
 
 @property
@@ -22,6 +22,12 @@ class Game:
 
         self.cs = cs
         self.entities = entities
+        self.entity = self.get_entity()
+        self.ray = self.get_ray()
+        self.object = self.get_object()
+        self.camera = self.get_camera()
+        self.hyperplane = self.get_hyperplane()
+        self.hyperellipsoid = self.get_hyperellipsoid()
 
     def run(self):
         pass
@@ -47,7 +53,7 @@ class Game:
         return GameRay
 
     def get_object(self):
-        class GameObject(self.get_entity()):
+        class Object(self.entity):
             def __init__(pself, position: Point,
                          direction: Union[Vector, list[int, float], None] = None):
                 super().__init__()
@@ -100,10 +106,10 @@ class Game:
             def intersection_distance(self, ray: Ray):
                 pass
 
-        return GameObject
+        return Object
 
     def get_camera(self):
-        class GameCamera(self.get_object()):
+        class Camera(self.object):
             def __init__(self, position: Point, draw_distance: Union[int, float],
                          fov: Union[int, float], direction: Vector = None,
                          vfov: Union[int, float] = None,
@@ -130,10 +136,10 @@ class Game:
                 if self.look_at != None:
                     pass
                 
-        return GameCamera 
+        return Camera 
                 
     def get_hyperplane(self):
-        class GameHyperPlane(self.get_object()):
+        class HyperPlane(self.object):
             def __init__(self, position: Point, normal: Vector):
                 if not isinstance(position, Point):
                     raise EngineException(EngineException.WRONG_INPUT("Point"))
@@ -158,8 +164,32 @@ class Game:
             move = restricted
             set_direction = restricted
         
-        return GameHyperPlane
+        return HyperPlane
     
     def get_hyperellipsoid(self):
-        class GameHyperEllipsoid(self.get_object()):
-            pass
+        class HyperEllipsoid(self.object):
+            def __init__(self, position: Point, direction: Vector, semiaxes: list[float]):
+                if not isinstance(position, Point):
+                    raise EngineException(EngineException.WRONG_INPUT("Point"))
+                
+                if not isinstance(direction, Vector):
+                    raise EngineException(EngineException.WRONG_INPUT("Vector"))
+                
+                self.set_position(position)
+                self.set_direction(direction)
+                self.semiaxes = semiaxes
+                
+        return HyperEllipsoid
+
+    def get_canvas(self):
+        class Canvas:
+            def __init__(self, n: int, m: int):
+                self.n = n
+                self.m = m
+                self.distances = Matrix.zero_matrix(n, m)
+                
+            def draw(self):
+                pass
+            
+            def update(self, camera: self.camera):
+                pass
