@@ -23,6 +23,9 @@ class Ray:
         self.initpoint = initpoint
         self.direction = direction
 
+    def normalize(self):
+        return self.direction.norm()
+
 
 class Identifier:
     def __generate_id__(self):

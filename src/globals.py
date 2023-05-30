@@ -3,4 +3,8 @@ def init():
     cs = None
     
     global precision
-    precision = 3
+    precision = 4
+    
+    global display_size
+    display_size = 16/9
+    

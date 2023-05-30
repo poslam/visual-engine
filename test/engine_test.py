@@ -1,4 +1,4 @@
-from math import pi
+from math import atan, tan, pi
 import os
 import sys
 import pytest
@@ -181,7 +181,7 @@ class TestGameCamera:
         game = Game(cs, EntityList(Entity(cs)))
         camera = game.get_camera()(Point([1, 1, 1]), draw_distance=15, fov=10)
         
-        act = (camera["vfov"] == round(2/3*camera["fov"], globals.precision))
+        act = (camera["vfov"] == round(atan(globals.display_size*tan(camera["fov"]/2)), globals.precision))
         
         assert act
         

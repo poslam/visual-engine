@@ -1,3 +1,6 @@
+30.05.23
+- Ray.normalize()
+
 28.05.23
 - починены Vector.rotate(), Vector.rotate_3d()
 - написаны тесты для GameObject, GameCamera
