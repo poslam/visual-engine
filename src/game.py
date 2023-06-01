@@ -104,7 +104,7 @@ class Game:
                 self.set_property("direction", direction)
                 
             def intersection_distance(self, ray: Ray):
-                pass
+                return 0
 
         return Object
 
@@ -131,8 +131,21 @@ class Game:
                 
             def get_rays_matrix(self, n: int, m: int):
                 if self.direction != None:
-                    pass
-                
+                    result = Matrix.zero_matrix(n, m)
+                    
+                    alpha, beta = self.fov, self.vfov
+                    dalpha, dbeta = alpha/n, beta/m
+                    vec = self.direction
+                    
+                    for i in range(n):
+                        for j in range(m):
+                            temp_vec = vec.copy()
+                            temp_vec.rotate([0, 1], dalpha*i-alpha/2)
+                            temp_vec.rotate([0, 2], dbeta*j-beta/2)
+                            result[i][j] = temp_vec
+                    
+                    return result
+                                                     
                 if self.look_at != None:
                     pass
                 
@@ -193,3 +206,5 @@ class Game:
             
             def update(self, camera: self.camera):
                 pass
+            
+        return Canvas

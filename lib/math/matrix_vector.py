@@ -158,7 +158,7 @@ class Matrix:
         for i in range(self.rows):
             for j in range(self.columns):
                 result[i][j] = BilinearForm(
-                    identity, self[i], self[j])
+                    identity, Vector(self[i]), Vector(self[j]))
         return result
 
     def transpose(self):
@@ -266,7 +266,7 @@ class Matrix:
         return self + (obj*(-1))
 
     def __getitem__(self, key: int):
-        return Vector(self.data[key])
+        return self.data[key]
 
     def __setitem__(self, key: int, item):
         self.data[key] = item
@@ -388,9 +388,9 @@ class Vector(Matrix):
             else:
                 vs = globals.cs.vs
 
-                basis_v1 = Vector(vs.basis[0].values)
-                basis_v2 = Vector(vs.basis[1].values)
-                basis_v3 = Vector(vs.basis[2].values)
+                basis_v1 = Vector(vs.basis[0])
+                basis_v2 = Vector(vs.basis[1])
+                basis_v3 = Vector(vs.basis[2])
 
                 v1 = basis_v2.__additional_vec_prod(basis_v3)
                 v2 = basis_v3.__additional_vec_prod(basis_v1)
@@ -468,11 +468,11 @@ class Vector(Matrix):
         return self.values[key][0]
     
     def __setitem__(self, key: int, item):
-        if self.is_transposed == False:
-            self.values[key] = item
-        else:
+        if self.is_transposed:
             self.values[key][0] = item
-            
+        else:
+            self.values[key] = item
+  
     def __truediv__(self, obj: Union[int, float]):
         return self.division(obj)
 
