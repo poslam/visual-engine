@@ -1,6 +1,6 @@
 from random import randint
 from src.game import Game
-from lib.engine.engine import Entity, EntityList
+from lib.engine.engine import Entity, EntityList, Ray
 from lib.math import *
 import src.globals as globals
 
@@ -23,4 +23,9 @@ a = camera.get_rays_matrix(10, 10)
 
 
 for i in a:
-    print(i) 
+    for j in i:
+        print(j.initpoint, j.direction) 
+
+
+# r = Ray(globals.cs, p1, Vector([1, 1, 1]))
+# print(r.direction)

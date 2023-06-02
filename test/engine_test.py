@@ -6,7 +6,7 @@ import pytest
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(SCRIPT_DIR))
 
-from src.game import Game
+from lib.engine.game import Game
 from lib.exceptions.engine_exc import EngineException
 from lib.engine.engine import Entity, EntityList
 from lib.math.cs import CoordinateSystem
