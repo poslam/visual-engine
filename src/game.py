@@ -52,12 +52,13 @@ class MyGame(Game):
             def intersection_distance(self, ray: Ray):
                 ray_inp_vec = Vector([x for x in ray.initpoint.values])
                 pos_vec = Vector([x for x in self.position.values])
+                dim = ray.direction.size
+                
                 t = -((self.normal & (ray_inp_vec-pos_vec)) /
                       (self.normal & ray.direction))
 
-                temp_vec = Vector([ray_inp_vec[0]+ray.direction[0]*t,
-                                   ray_inp_vec[1]+ray.direction[1]*t,
-                                   ray_inp_vec[2]+ray.direction[2]*t])
+                temp_vec = Vector([ray_inp_vec[i]+ray.direction[i]*t
+                                   for i in range(dim)])
 
                 return temp_vec.len()
 
@@ -79,12 +80,11 @@ class MyGame(Game):
 
             def intersection_distance(self, ray: Ray):
                 dir, pos = ray.direction, ray.initpoint-self.position
-
-                a, b, c = self.semiaxes[0]**2, self.semiaxes[1]**2, self.semiaxes[2]**2
-
-                p1 = dir[0]**2/a + dir[1]**2/b + dir[2]**2/c
-                p2 = 2*pos[0]*dir[0]/a + 2*pos[1]*dir[1]/b + 2*pos[2]*dir[2]/c
-                p3 = -1 + pos[0]**2/a + pos[1]**2/b + pos[2]**2/c
+                dim = ray.direction.size
+                
+                p1 = sum(dir[i]**2/self.semiaxes[i]**2 for i in range(dim))
+                p2 = sum(2*pos[i]*dir[i]/self.semiaxes[i]**2 for i in range(dim))
+                p3 = sum(pos[i]**2/self.semiaxes[i]**2 for i in range(dim)) - 1
 
                 t1 = (-p2 + (p2**2-4*p1*p3)**0.5)/2*p1
                 t2 = (-p2 - (p2**2-4*p1*p3)**0.5)/2*p1
@@ -97,11 +97,10 @@ class MyGame(Game):
 
                 t = min(t)
 
-                intersection_vec = Vector([ray.initpoint[0]+dir[0]*t,
-                                           ray.initpoint[1]+dir[1]*t,
-                                           ray.initpoint[2]+dir[2]*t])
+                intersection_vec = Vector([ray.initpoint[i]+dir[i]*t
+                                           for i in range(dim)])
 
-                temp = Vector([pos[0], pos[1], pos[2]])
+                temp = pos.as_vector()
 
                 return (intersection_vec-temp).len()
 

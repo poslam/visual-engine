@@ -21,6 +21,9 @@ class Point(Vector):
 
         return Point([self.values[i]-vector.values[i]
                       for i in range(self.size)])
+        
+    def as_vector(self):
+        return Vector([x for x in self.values])
     
     def __add__(self, vector: Vector):
         return self.addition(vector)
