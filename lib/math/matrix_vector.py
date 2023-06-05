@@ -427,9 +427,12 @@ class Vector(Matrix):
     
     def division(self, obj: Union[int, float]):
         if not isinstance(obj, (int, float)):
-            return MathException(MathException.WRONG_USAGE)
+            raise MathException(MathException.WRONG_USAGE)
         
         data = self.values
+        
+        if obj == 0:
+            raise MathException(MathException.ZERO_DIVISION)
         
         for i in range(len(data)):
             data[i] = data[i]/obj

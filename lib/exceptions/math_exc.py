@@ -6,3 +6,4 @@ class MathException(Exception):
     BASIS_ERROR = "given matrix or list of vector is not a basis"
     QUADRATIC_MATRIX = "this operation suports only quadratic matrices"
     SINGULAR_MATRIX = "this operation supports only matrices with determinant not equal to zero"
+    ZERO_DIVISION = "division by zero is forbidden"

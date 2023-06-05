@@ -1,5 +1,6 @@
 from math import atan, pi, tan
 from typing import Union
+from lib.exceptions.math_exc import MathException
 
 import src.globals as globals
 from lib.engine.engine import Entity, EntityList, Ray
@@ -64,7 +65,7 @@ class Game:
                 position = Point([round(x, globals.precision)
                                  for x in position.values])
 
-                if direction is not None:
+                if direction is not None and direction != Vector([0, 0, 0]):
                     direction = Vector([round(x, globals.precision)
                                         for x in direction.norm().values])
 
@@ -95,7 +96,7 @@ class Game:
                 self.set_property("position", position)
 
             def set_direction(self, direction: Vector):
-                if direction != None:
+                if direction != None and direction != Vector([0, 0, 0]):
                     direction = Vector([round(x, globals.precision)
                                         for x in direction.norm().values])
 
@@ -140,12 +141,20 @@ class Game:
                             temp_vec = vec.copy()
                             temp_vec.rotate([0, 1], dalpha*i-alpha/2)
                             temp_vec.rotate([0, 2], dbeta*j-beta/2)
+                            if (vec&temp_vec) == 0:
+                                raise MathException(MathException.ZERO_DIVISION)
+                            temp_vec = (temp_vec*(vec.len()**2/(vec&temp_vec)))
                             temp_vec.values = [round(x, globals.precision) for x in temp_vec.values]
                             result[i][j] = Ray(self.cs, self.position, temp_vec)
                     
                     return result
                                                      
                 if self.look_at != None:
-                    pass
+                    look_at_vec = Vector([x for x in self.look_at.values])
+                    position_vec = Vector([x for x in self.position.values])
+                    
+                    return Ray(globals.cs, self.position, 
+                               (look_at_vec-position_vec).norm())
+                    
                 
         return Camera 
