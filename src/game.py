@@ -1,5 +1,6 @@
 from typing import Union
 
+import src.globals as globals
 from lib.engine.engine import EntityList, Ray
 from lib.engine.game import Game
 from lib.exceptions.engine_exc import EngineException
@@ -14,7 +15,9 @@ def restricted(self):
 
 
 class MyGame(Game):
-    def __init__(self, cs: CoordinateSystem, entities: EntityList):
+    def __init__(self, cs: CoordinateSystem, entities: EntityList=None):
+        if entities == None:
+            entities = EntityList()
         super().__init__(cs, entities)
 
     def run(self):
@@ -28,7 +31,7 @@ class MyGame(Game):
 
     def get_hyperplane(self):
         class HyperPlane(self.object):
-            def __init__(self, position: Point, normal: Vector):
+            def __init__(pself, position: Point, normal: Vector):
                 if not isinstance(position, Point):
                     raise EngineException(EngineException.WRONG_INPUT("Point"))
 
@@ -37,11 +40,13 @@ class MyGame(Game):
                         EngineException.WRONG_INPUT("Vector"))
 
                 super().__init__(position)
+                
+                pself.position = position
+                pself.normal = normal.norm()
+                
+                self.entities.append(pself)
 
-                self.position = position
-                self.normal = normal.norm()
-
-            def planar_rotate(self, inds: list[int], angle: float):
+            def planar_rotate(self, inds: list[int], angle: Union[int, float]):
                 normal = self.normal.rotate(inds, angle)
                 self.normal = normal
 
@@ -60,7 +65,7 @@ class MyGame(Game):
                 temp_vec = Vector([ray_inp_vec[i]+ray.direction[i]*t
                                    for i in range(dim)])
 
-                return temp_vec.len()
+                return round(temp_vec.len(), globals.precision)
 
             move = restricted
 
@@ -68,7 +73,7 @@ class MyGame(Game):
 
     def get_hyperellipsoid(self):
         class HyperEllipsoid(self.object):
-            def __init__(self, position: Point, direction: Vector, semiaxes: list[float]):
+            def __init__(pself, position: Point, direction: Vector, semiaxes: list[float]):
                 if not isinstance(position, Point):
                     raise EngineException(EngineException.WRONG_INPUT(Point))
 
@@ -76,7 +81,16 @@ class MyGame(Game):
                     raise EngineException(EngineException.WRONG_INPUT(Vector))
 
                 super().__init__(position, direction)
-                self.semiaxes = semiaxes
+                pself.semiaxes = semiaxes
+                self.entities.append(pself)
+
+            def planar_rotate(self, inds: list[int], angle: Union[int, float]):
+                direction = self.direction.rotate(inds, angle)
+                self.set_direction(direction)
+
+            def rotate_3d(self, angles: list[Union[int, float]]):
+                direction = self.direction.rotate_3d(angles)
+                self.set_direction(direction)
 
             def intersection_distance(self, ray: Ray):
                 dir, pos = ray.direction, ray.initpoint-self.position
@@ -93,7 +107,7 @@ class MyGame(Game):
                                  if isinstance(y, (int, float))] if x > 0]
 
                 if len(t) == 0:
-                    return -1
+                    return 0
 
                 t = min(t)
 
@@ -102,19 +116,33 @@ class MyGame(Game):
 
                 temp = pos.as_vector()
 
-                return (intersection_vec-temp).len()
+                return round((intersection_vec-temp).len(), globals.precision)
 
         return HyperEllipsoid
 
+    def get_canvas(self):
+        class Canvas:
+            def __init__(self, n: int, m: int):
+                self.n = n
+                self.m = m
+                self.distances = Matrix.zero_matrix(n, m)
 
-class Canvas:
-    def __init__(self, n: int, m: int):
-        self.n = n
-        self.m = m
-        self.distances = Matrix.zero_matrix(n, m)
+            def draw(self):
+                pass
 
-    def draw(self):
-        pass
-
-    def update(self, camera):
-        pass
+            def update(pself, camera: self.get_camera()):
+                rays = camera.get_rays_matrix(pself.n, pself.m)
+                    
+                for i in range(pself.n):
+                    for j in range(pself.m):
+                        result = []
+                        for ent in self.entities:
+                            result.append(ent.intersection_distance(rays[i][j]))
+                        y = [z for z in result if z > 0]
+                        if len(y) == 0:
+                            y = 0
+                        else:
+                            y = min(y)
+                        pself.distances[i][j] = y    
+                
+        return Canvas

@@ -79,7 +79,9 @@ class Entity:
 
 
 class EntityList:
-    def __init__(self, entities: list):
+    def __init__(self, entities: list = None):
+        if entities == None:
+            entities = []
         self.entities = entities
 
     def append(self, entity: 'Entity'):
@@ -106,6 +108,9 @@ class EntityList:
     def exec(self, f, *args, **kwargs):
         for i in self.entities:
             f(i, *args, **kwargs)
+    
+    def __repr__(self):
+        return str([x.id.id for x in self.entities])
 
-    def __getitem__(self, id: Identifier):
-        return self.get(id)
+    def __getitem__(self, key):
+        return self.entities[key]

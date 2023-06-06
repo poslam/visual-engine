@@ -12,36 +12,44 @@ cs = CoordinateSystem(p1, vs)
 
 globals.cs = cs
 
-# v1 = Vector([1, 1, 1])
-# for i in range(5):
-#     vec = v1.copy()
-#     vec.rotate([0, 1], i*10)
-#     print(vec, v1)
+
 
 g = Game(cs, EntityList(Entity))
 
 camera = g.camera(Point([0, 0, 0]), draw_distance=100, fov=100,
-                                        direction=Vector([1, 1, 1]))
+                                        direction=Vector([200, 20, 1]))
 
 a = camera.get_rays_matrix(10, 10)
 
-myg = MyGame(cs, EntityList(Entity))
+x = Entity(cs)
+x.pravo = "slavno"
 
-# obj = myg.get_hyperellipsoid()(position=Point([200, 200, 200]), 
-#                                direction=Vector([2, 1, 89]), 
-#                                semiaxes=[100, 200, 50])
+myg = MyGame(cs)
 
-obj = myg.get_hyperplane()(Point([1000, 1000, 1000]), normal=Vector([1, 1, 1]))
+canv = myg.get_canvas()(10, 10)
 
-for i in a:
-    for j in i:
-        x = obj.intersection_distance(j)
-        print(j.direction, x)
 
+obj = myg.get_hyperellipsoid()(position=Point([1000, 200, 200]), 
+                               direction=Vector([2, 1, 89]), 
+                               semiaxes=[100, 200, 50])
+# for i in a:
+#     for j in i:
+#         print(obj.intersection_distance(j))
+
+# print("xyz")
+
+obj = myg.get_hyperplane()(Point([-100, -100, -100]), normal=Vector([1, 1, 1]))
 
 # for i in a:
 #     for j in i:
-#         print(j.direction)
+#         print(obj.intersection_distance(j))
 
-# r = Ray(globals.cs, p1, Vector([1, 1, 1]))
-# print(r.direction)
+canv.update(camera)
+
+print(canv.distances)
+
+
+# for i in myg.entities:
+#     print(i.intersection_distance(a[0][0]))
+
+# print(myg.entities))

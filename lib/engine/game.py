@@ -14,12 +14,12 @@ def restricted(self):
     raise AttributeError(f'{self.__class__} does not have this attribite')
 
 class Game:
-    def __init__(self, cs: CoordinateSystem, entities: EntityList):
+    def __init__(self, cs: CoordinateSystem, entities: EntityList=None):
         if not (isinstance(cs, CoordinateSystem)):
             raise EngineException(EngineException.WRONG_INPUT("CoordinateSystem"))
-        
-        if not isinstance(entities, EntityList):
-            raise EngineException(EngineException.WRONG_INPUT("EntityList"))
+
+        if entities == None:
+            entities = EntityList()
 
         self.cs = cs
         self.entities = entities

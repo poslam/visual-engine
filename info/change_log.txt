@@ -1,3 +1,6 @@
+06.05.23
+- Canvas.update()
+
 05.06.23
 - добавил нормирование векторов в Camera.get_rays_matrix()
 - добавил Camera.get_rays_matrix() для случая, если задано не direction, а look_at
