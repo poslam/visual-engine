@@ -22,13 +22,7 @@ class TestIntersection:
 
         a = camera.get_rays_matrix(10, 10)
 
-        x = Entity(cs)
-        x.pravo = "slavno"
-
         myg = MyGame(cs)
-
-        canv = myg.get_canvas()(10, 10)
-
 
         obj = myg.get_hyperellipsoid()(position=Point([1000, 200, 200]), 
                                     direction=Vector([2, 1, 89]), 
