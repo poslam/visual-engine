@@ -146,3 +146,11 @@ class MyGame(Game):
                         pself.distances[i][j] = y    
                 
         return Canvas
+    
+    def get_console(self):
+        class Console(self.get_canvas()):
+            def __init__(self):
+                self.charmap = ".:;><+r*zsvfwqkP694VOGbUAKXH8RD#$B0MNWQ%&@" 
+                
+            def draw():
+                pass

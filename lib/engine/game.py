@@ -1,5 +1,7 @@
 from math import atan, pi, tan
 from typing import Union
+from config.config import Configuration
+from src.event_system import EventSystem
 from lib.exceptions.math_exc import MathException
 
 import src.globals as globals
@@ -14,13 +16,14 @@ def restricted(self):
     raise AttributeError(f'{self.__class__} does not have this attribite')
 
 class Game:
-    def __init__(self, cs: CoordinateSystem, entities: EntityList=None):
+    def __init__(self, cs: CoordinateSystem, es: EventSystem, entities: EntityList=None):
         if not (isinstance(cs, CoordinateSystem)):
             raise EngineException(EngineException.WRONG_INPUT("CoordinateSystem"))
 
         if entities == None:
             entities = EntityList()
 
+        self.es = es
         self.cs = cs
         self.entities = entities
         self.entity = self.get_entity()
@@ -36,6 +39,9 @@ class Game:
 
     def exit(self):
         pass
+    
+    def get_event_system(self):
+        return self.es
 
     def get_entity(self):
         class GameEntity(Entity):
@@ -158,3 +164,5 @@ class Game:
                     
                 
         return Camera 
+    
+    
