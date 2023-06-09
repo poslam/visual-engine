@@ -4,3 +4,4 @@ class EngineException(Exception):
     DIRECTION_ERROR = "this object doesn't have direction to do this operation"
     ROOT_PROPERTY = "trying to access root property"
     WRONG_INPUT = lambda x: f"trying to input data, that's not allowed. allowed data is/are: {x.__class__}"
+    NEED_UPDATE = lambda x: f"need to update following object: {x}"

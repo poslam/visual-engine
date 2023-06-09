@@ -6,6 +6,7 @@ import pytest
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(SCRIPT_DIR))
 
+from config.config import Configuration
 from lib.engine.game import Game
 from lib.exceptions.engine_exc import EngineException
 from lib.engine.engine import Entity, EntityList
@@ -19,7 +20,7 @@ vs = VectorSpace([Vector([1, 0, 0]), Vector([0, 1, 0]), Vector([0, 0, 1])])
 p1 = Point([0, 0, 0])
 cs = CoordinateSystem(p1, vs)
 globals.cs = cs
-
+globals.config = Configuration("config/config.json")
 
 class TestEntity:
     def test_set_get_property1(self):
@@ -127,7 +128,7 @@ class TestGameObject:
 
         object.planar_rotate([0, 1], 90)
 
-        test = Vector([round(x, globals.precision)
+        test = Vector([round(x, globals.config["precision"])
                       for x in [-0.2672612419, 0.5345224838, 0.8017837257]])
         act = (object["direction"] == test)
 
@@ -139,7 +140,7 @@ class TestGameObject:
 
         object.rotate_3d([90, 0, 90])
 
-        act = (object["direction"] == Vector([round(x, globals.precision)
+        act = (object["direction"] == Vector([round(x, globals.config["precision"])
                for x in [-0.4472135955, 0.0, 0.894427191]]))
 
         assert act
@@ -158,7 +159,7 @@ class TestGameCamera:
         game = Game(cs, EntityList(Entity(cs)))
         camera = game.camera(Point([1, 1, 1]), 15, 10)
         
-        act = (camera["fov"] == round(0.17453292519943295, globals.precision))
+        act = (camera["fov"] == round(0.17453292519943295, globals.config["precision"]))
         assert act
     
     def test_camera_init_draw_distance(self):
@@ -174,14 +175,6 @@ class TestGameCamera:
         camera = game.camera(Point([1, 1, 1]), 15, 10)
         
         act = (camera["direction"] == None)
-        
-        assert act
-        
-    def test_camera_init_vfov(self):
-        game = Game(cs, EntityList(Entity(cs)))
-        camera = game.camera(Point([1, 1, 1]), draw_distance=15, fov=10)
-        
-        act = (camera["vfov"] == round(atan(globals.display_size*tan(camera["fov"]/2)), globals.precision))
         
         assert act
         

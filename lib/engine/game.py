@@ -16,7 +16,7 @@ def restricted(self):
     raise AttributeError(f'{self.__class__} does not have this attribite')
 
 class Game:
-    def __init__(self, cs: CoordinateSystem, es: EventSystem, entities: EntityList=None):
+    def __init__(self, cs: CoordinateSystem, es: EventSystem=None, entities: EntityList=None):
         if not (isinstance(cs, CoordinateSystem)):
             raise EngineException(EngineException.WRONG_INPUT("CoordinateSystem"))
 
@@ -68,11 +68,11 @@ class Game:
                 if not isinstance(direction, Union[Vector, list, None]):
                     raise EngineException(EngineException.WRONG_INPUT("(Vector, list, None)"))
 
-                position = Point([round(x, globals.precision)
+                position = Point([round(x, globals.config["precision"])
                                  for x in position.values])
 
                 if direction is not None and direction != Vector([0, 0, 0]):
-                    direction = Vector([round(x, globals.precision)
+                    direction = Vector([round(x, globals.config["precision"])
                                         for x in direction.norm().values])
 
                 pself.set_direction(direction)
@@ -96,14 +96,14 @@ class Game:
                 self.set_direction(direction)
 
             def set_position(self, position: Point):
-                position = Point([round(x, globals.precision)
+                position = Point([round(x, globals.config["precision"])
                                  for x in position.values])
 
                 self.set_property("position", position)
 
             def set_direction(self, direction: Vector):
                 if direction != None and direction != Vector([0, 0, 0]):
-                    direction = Vector([round(x, globals.precision)
+                    direction = Vector([round(x, globals.config["precision"])
                                         for x in direction.norm().values])
 
                 self.set_property("direction", direction)
@@ -121,13 +121,13 @@ class Game:
                          look_at: Point = None):
                 super().__init__(position, direction)
 
-                draw_distance = round(draw_distance, globals.precision)
-                fov = round(fov*pi/180, globals.precision)
+                draw_distance = round(draw_distance, globals.config["precision"])
+                fov = round(fov*pi/180, globals.config["precision"])
 
                 if vfov == None:
-                    vfov = round(atan(globals.display_size*tan(fov/2)), globals.precision)
+                    vfov = round(atan(globals.config["canvas"]["m"]/globals.config["canvas"]["n"]*tan(fov/2)), globals.config["precision"])
                 else:
-                    vfov = round(vfov, globals.precision)
+                    vfov = round(vfov, globals.config["precision"])
 
                 self.set_property("fov", fov)
                 self.set_property("vfov", vfov)
@@ -150,7 +150,7 @@ class Game:
                             if (vec&temp_vec) == 0:
                                 raise MathException(MathException.ZERO_DIVISION)
                             temp_vec = (temp_vec*(vec.len()**2/(vec&temp_vec)))
-                            temp_vec.values = [round(x, globals.precision) for x in temp_vec.values]
+                            temp_vec.values = [round(x, globals.config["precision"]) for x in temp_vec.values]
                             result[i][j] = Ray(self.cs, self.position, temp_vec)
                     
                     return result

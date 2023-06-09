@@ -15,7 +15,7 @@ class EventSystem:
         self.events[name].remove(func)
         
     def trigger(self, name: str, *args):
-        for event in self.events["name"]:
+        for event in self.events[name]:
             event(*args)
             
     def get_handled(self, name: str):

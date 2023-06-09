@@ -43,6 +43,9 @@ class Matrix:
         return result
     
     def equalize(self, obj: 'Matrix'):
+        if obj == None:
+            return False
+        
         if not (self.rows == obj.rows and self.columns == obj.columns):
             return False
 

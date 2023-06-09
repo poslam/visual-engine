@@ -1,3 +1,4 @@
+from curses import wrapper
 from typing import Union
 
 import src.globals as globals
@@ -7,6 +8,7 @@ from lib.exceptions.engine_exc import EngineException
 from lib.math.cs import CoordinateSystem
 from lib.math.matrix_vector import Matrix, Vector
 from lib.math.point import Point
+from src.event_system import EventSystem
 
 
 @property
@@ -15,19 +17,45 @@ def restricted(self):
 
 
 class MyGame(Game):
-    def __init__(self, cs: CoordinateSystem, entities: EntityList=None):
+    def __init__(self, cs: CoordinateSystem, es: EventSystem = None, entities: EntityList = None):
         if entities == None:
             entities = EntityList()
-        super().__init__(cs, entities)
+        super().__init__(cs, es, entities)
 
-    def run(self):
-        pass
+    def run(self, canvas, camera):
+        try:
+            matr = canvas.out_matr
+        except:
+            raise EngineException(EngineException.WRONG_INPUT(self.get_canvas()))
+        
+        if matr == None:
+            raise EngineException(EngineException.NEED_UPDATE("canvas"))
+        
+        def main(stdscr):
+            stdscr.clear() 
+                    
+            while True:
+                canvas.update(camera)
+                
+                for i in range(matr.rows):
+                    for j in range(matr.columns):
+                        stdscr.addch(i, j, matr[i][j]) 
+                
+                key = stdscr.getkey() 
+                if key == "l":
+                    break
+                if key == "w":
+                    self.es["move", camera, camera.direction]
+                elif key == "s":
+                    self.es["move", camera, (-1)*camera.direction.norm()]
+                elif key == "a":
+                    self.es["move", camera, Vector.vector_product(camera.direction.norm(), Vector([0, 0, -1]))]
+                elif key == "d":
+                    self.es["move", camera, Vector.vector_product(camera.direction.norm(), Vector([0, 0, 1]))]
+                # elif key == "KEY_UP":
+                #     self.es["rotate"]
 
-    def update(self):
-        pass
-
-    def exit(self):
-        pass
+        wrapper (main)
 
     def get_hyperplane(self):
         class HyperPlane(self.object):
@@ -40,10 +68,10 @@ class MyGame(Game):
                         EngineException.WRONG_INPUT("Vector"))
 
                 super().__init__(position)
-                
+
                 pself.position = position
                 pself.normal = normal.norm()
-                
+
                 self.entities.append(pself)
 
             def planar_rotate(self, inds: list[int], angle: Union[int, float]):
@@ -58,14 +86,14 @@ class MyGame(Game):
                 ray_inp_vec = Vector([x for x in ray.initpoint.values])
                 pos_vec = Vector([x for x in self.position.values])
                 dim = ray.direction.size
-                
+
                 t = -((self.normal & (ray_inp_vec-pos_vec)) /
                       (self.normal & ray.direction))
 
                 temp_vec = Vector([ray_inp_vec[i]+ray.direction[i]*t
                                    for i in range(dim)])
 
-                return round(temp_vec.len(), globals.precision)
+                return round(temp_vec.len(), globals.config["precision"])
 
             move = restricted
 
@@ -95,9 +123,10 @@ class MyGame(Game):
             def intersection_distance(self, ray: Ray):
                 dir, pos = ray.direction, ray.initpoint-self.position
                 dim = ray.direction.size
-                
+
                 p1 = sum(dir[i]**2/self.semiaxes[i]**2 for i in range(dim))
-                p2 = sum(2*pos[i]*dir[i]/self.semiaxes[i]**2 for i in range(dim))
+                p2 = sum(2*pos[i]*dir[i]/self.semiaxes[i]
+                         ** 2 for i in range(dim))
                 p3 = sum(pos[i]**2/self.semiaxes[i]**2 for i in range(dim)) - 1
 
                 t1 = (-p2 + (p2**2-4*p1*p3)**0.5)/2*p1
@@ -116,33 +145,60 @@ class MyGame(Game):
 
                 temp = pos.as_vector()
 
-                return round((intersection_vec-temp).len(), globals.precision)
+                return round((intersection_vec-temp).len(), globals.config["precision"])
 
         return HyperEllipsoid
 
     def get_canvas(self):
         class Canvas:
-            def __init__(self, n: int, m: int):
-                self.n = n
-                self.m = m
-                self.distances = Matrix.zero_matrix(n, m)
-
-            def draw(self):
-                pass
+            def __init__(self, n: int = None, m: int = None):
+                if n != None:
+                    self.n = n
+                else:
+                    self.n = globals.config["canvas"]["n"]
+                if m != None:
+                    self.m = m
+                else:
+                    self.m = globals.config["canvas"]["m"]
+                self.distances = Matrix.zero_matrix(self.n, self.m)
+                self.out_matr = None
 
             def update(pself, camera: self.get_camera()):
                 rays = camera.get_rays_matrix(pself.n, pself.m)
-                    
+
                 for i in range(pself.n):
                     for j in range(pself.m):
                         result = []
                         for ent in self.entities:
-                            result.append(ent.intersection_distance(rays[i][j]))
+                            result.append(
+                                ent.intersection_distance(rays[i][j]))
                         y = [z for z in result if z > 0]
                         if len(y) == 0:
                             y = 0
                         else:
                             y = min(y)
-                        pself.distances[i][j] = y    
+                        pself.distances[i][j] = y
+                        
+                charmap = globals.config["charmap"]
+                l = len(charmap)
                 
+                step = globals.config["camera"]["draw_distance"] / l    
+                list_steps = [step*i for i in range(l)]
+                
+                matr = pself.distances
+                
+                out_matr = Matrix.zero_matrix(pself.n, pself.m)
+                
+                for i in range(pself.n):
+                    for j in range(pself.m):
+                        for k in range(l):
+                            if matr[i][j] == 0:
+                                out_matr[i][j] = ' '
+                                break
+                            if matr[i][j] < list_steps[k]:
+                                out_matr[i][j] = charmap[k]
+                                break
+                            
+                pself.out_matr = out_matr
+
         return Canvas
