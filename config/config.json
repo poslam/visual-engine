@@ -1,1 +1,14 @@
-{"bbb": "aaaa"}
+{
+    "precision": 4,
+    "camera":
+    {
+        "draw_distance": 120,
+        "fov": 120
+        
+    },
+    "charmap": ".:; ><+r*zsvfwqkP694VOGbUAKXH8RD#$B0MNWQ%&@",
+    "canvas":
+    {
+        
+    }
+}

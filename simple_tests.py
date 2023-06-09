@@ -54,7 +54,20 @@
 
 # # print(myg.entities))
 
-from config.config import Configuration
+# from config.config import Configuration
 
-c = Configuration(filepath="config/config.json")
+# c = Configuration(filepath="config/config.json")
 
+import curses
+from curses import wrapper
+
+
+
+def main(stdscr):
+    editwin = curses.newwin(5,30, 2,1)
+    stdscr.addch('+')
+
+    stdscr.refresh()
+    curses.echo()
+
+wrapper (main)
