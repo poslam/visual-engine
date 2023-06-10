@@ -42,6 +42,7 @@ class MyGame(Game):
             
                 key = stdscr.getkey() 
                 if key == "l":
+                    open('log.txt', 'w').close()
                     break
                 if key == "w":
                     dist = camera.direction*10
@@ -64,11 +65,11 @@ class MyGame(Game):
                     k += 1
                     stdscr.addstr(59, 180, f"{k} move complete")
                 elif key == "KEY_UP":
-                    self.es.trigger("rotate_ver", camera, camera.direction-Vector([0, 0, 0.005]))
+                    self.es.trigger("rotate_ver", camera, camera.direction+Vector([0, 0, 0.05]))
                     p += 1
                     stdscr.addstr(60, 180, f"{p} rotate complete")
                 elif key == "KEY_DOWN":
-                    self.es.trigger("rotate_ver", camera, camera.direction+Vector([0, 0, 0.005]))
+                    self.es.trigger("rotate_ver", camera, camera.direction-Vector([0, 0, 0.05]))
                     p += 1
                     stdscr.addstr(60, 180, f"{p} rotate complete")
                 elif key == "KEY_RIGHT":
@@ -79,8 +80,10 @@ class MyGame(Game):
                     self.es.trigger("rotate_hor", camera, [0, 1], 1)
                     p += 1
                     stdscr.addstr(60, 180, f"{p} rotate complete")
-                
-
+                # with open("log.txt", 'w') as f:
+                #     for i in canvas.distances:
+                #         f.write(str(i)+'\n')
+                #     f.close()
         wrapper (main)
 
     def get_hyperplane(self):
@@ -201,12 +204,12 @@ class MyGame(Game):
                         for ent in self.entities:
                             result.append(
                                 ent.intersection_distance(rays[i][j]))
-                        y = [z for z in result if z > 0]
-                        if len(y) == 0:
-                            y = 0
+                        result = [x for x in result if x > 0]
+                        if len(result) == 0:
+                            result = 0
                         else:
-                            y = min(y)
-                        pself.distances[i][j] = y
+                            result = min(result)
+                        pself.distances[i][j] = result
                         
                 charmap = globals.config["charmap"]
                 l = len(charmap)

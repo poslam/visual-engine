@@ -111,15 +111,25 @@ class Game:
 
     def get_camera(self):
         class Camera(self.object):
-            def __init__(self, position: Point, draw_distance: Union[int, float],
-                         fov: Union[int, float], direction: Vector = None,
+            def __init__(self, position: Point, draw_distance: Union[int, float]=None,
+                         fov: Union[int, float]=None, direction: Vector = None,
                          vfov: Union[int, float] = None,
                          look_at: Point = None):
                 super().__init__(position, direction)
-
+                    
+                if draw_distance == None:
+                    draw_distance = globals.config["camera"]["draw_distance"]
+                else:
+                    raise Exception("draw distance is null")
+                    
+                if fov == None:
+                    fov = globals.config["camera"]["fov"]
+                else:
+                    raise Exception("fov is null")
+                
                 draw_distance = round(draw_distance, globals.config["precision"])
                 fov = round(fov*pi/180, globals.config["precision"])
-
+                
                 if vfov == None:
                     vfov = round(atan(globals.config["canvas"]["m"]/globals.config["canvas"]["n"]*tan(fov/2)), globals.config["precision"])
                 else:

@@ -2,7 +2,7 @@
     "precision": 5,
     "camera":
     {
-        "draw_distance": 120,
+        "draw_distance": 50,
         "fov": 90 
     },
     "charmap": "@&%QWNM0B$#DR8HXKAUbGOV496Pkqwfvszr*+<>;:.",

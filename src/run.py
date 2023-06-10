@@ -30,18 +30,14 @@ g.es = es
 
 canv = g.get_canvas()()
 
-camera = g.camera(Point([0, 0, 5]), draw_distance=100, fov=100,
-                                        direction=Vector([1, 1, 0.1]))
+camera = g.camera(Point([10, 10, 1]), direction=Vector([1, 1, 0]))
 
 obj = g.get_hyperellipsoid()(position=Point([1, 1, 10]), 
                                direction=Vector([2, 1, 1]), 
-                               semiaxes=[10, 50, 20])
+                               semiaxes=[0.1, 0.1, 0.1])
 
-obj = g.get_hyperplane()(Point([0, 0, 0 ]), normal=Vector([0, 1, 1]))
+obj = g.get_hyperplane()(Point([0, 0, 0]), normal=Vector([0, 1, 1]))
 
 canv.update(camera)
 
-# print(canv.distances)
-# g.run(canv, camera)
-
-print(Vector([-0.95399, 0.29166, 0.06954]).vector_product(Vector([0, 0, 1])))
+g.run(canv, camera)
