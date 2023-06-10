@@ -29,8 +29,8 @@ class MyGame(Game):
             k, p = 0, 0
                     
             while True:
-                stdscr.addstr(61, 200, f"camera at: {str(camera.position.values)}")
-                stdscr.addstr(62, 200, f"camera direction: {str(camera.direction.values)}")
+                stdscr.addstr(61, 180, f"camera at: {str(camera.position.values)}")
+                stdscr.addstr(62, 180, f"camera direction: {str(camera.direction.values)}")
                 
                 canvas.update(camera)
                 
@@ -48,39 +48,37 @@ class MyGame(Game):
                     dist[2] = 0
                     self.es.trigger("move", camera, dist)
                     k += 1
-                    stdscr.addstr(59, 200, f"{k} move complete")
+                    stdscr.addstr(59, 180, f"{k} move complete")
                 elif key == "s":
                     dist = (-1)*camera.direction*10
                     dist[2] = 0
                     self.es.trigger("move", camera, dist)
                     k += 1
-                    stdscr.addstr(59, 200, f"{k} move complete")
+                    stdscr.addstr(59, 180, f"{k} move complete")
                 elif key == "a":
-                    self.es.trigger("move", camera, 10*Vector.vector_product(camera.direction, Vector([0, 0, -1])))
+                    self.es.trigger("move", camera, 5*Vector.vector_product(camera.direction, Vector([0, 0, -1])))
                     k += 1
-                    stdscr.addstr(59, 200, f"{k} move complete")
+                    stdscr.addstr(59, 180, f"{k} move complete")
                 elif key == "d":
-                    self.es.trigger("move", camera, 10*Vector.vector_product(camera.direction, Vector([0, 0, 1])))
+                    self.es.trigger("move", camera, 5*Vector.vector_product(camera.direction, Vector([0, 0, 1])))
                     k += 1
-                    stdscr.addstr(59, 200, f"{k} move complete")
+                    stdscr.addstr(59, 180, f"{k} move complete")
                 elif key == "KEY_UP":
-                    self.es.trigger("rotate", camera, [0, 2], 20)
-                    self.es.trigger("rotate", camera, [1, 2], 20)
+                    self.es.trigger("rotate_ver", camera, camera.direction-Vector([0, 0, 0.005]))
                     p += 1
-                    stdscr.addstr(60, 200, f"{p} rotate complete")
+                    stdscr.addstr(60, 180, f"{p} rotate complete")
                 elif key == "KEY_DOWN":
-                    self.es.trigger("rotate", camera, [0, 2], -20)
-                    self.es.trigger("rotate", camera, [1, 2], -20)
+                    self.es.trigger("rotate_ver", camera, camera.direction+Vector([0, 0, 0.005]))
                     p += 1
-                    stdscr.addstr(60, 200, f"{p} rotate complete")
+                    stdscr.addstr(60, 180, f"{p} rotate complete")
                 elif key == "KEY_RIGHT":
-                    self.es.trigger("rotate", camera, [0, 1], -30)
+                    self.es.trigger("rotate_hor", camera, [0, 1], -1)
                     p += 1
-                    stdscr.addstr(60, 200, f"{p} rotate complete")
+                    stdscr.addstr(60, 180, f"{p} rotate complete")
                 elif key == "KEY_LEFT":
-                    self.es.trigger("rotate", camera, [0, 1], 30)
+                    self.es.trigger("rotate_hor", camera, [0, 1], 1)
                     p += 1
-                    stdscr.addstr(60, 200, f"{p} rotate complete")
+                    stdscr.addstr(60, 180, f"{p} rotate complete")
                 
 
         wrapper (main)
@@ -114,6 +112,9 @@ class MyGame(Game):
                 ray_inp_vec = Vector([x for x in ray.initpoint.values])
                 pos_vec = Vector([x for x in self.position.values])
                 dim = ray.direction.size
+
+                if (self.normal & ray.direction) == 0:
+                    return 0
 
                 t = -((self.normal & (ray_inp_vec-pos_vec)) /
                       (self.normal & ray.direction))

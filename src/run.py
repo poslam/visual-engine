@@ -4,11 +4,9 @@ import sys
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(SCRIPT_DIR))
 
-from src.event_system import EventSystem
-from lib.engine.game import Game
+from src.event_system import EventSystem    
 from src.game import MyGame
 
-from lib.engine.engine import Entity, EntityList
 from lib.math import *
 import src.globals as globals
 
@@ -25,7 +23,8 @@ globals.cs = cs
 
 
 g = MyGame(cs)
-es = EventSystem({"move": [g.get_camera().move], "rotate": [g.get_camera().planar_rotate]})
+es = EventSystem({"move": [g.get_camera().move], "rotate_hor": [g.get_camera().planar_rotate],
+                  "rotate_ver": [g.camera.set_direction]})
 g.es = es
 
 
@@ -36,11 +35,13 @@ camera = g.camera(Point([0, 0, 5]), draw_distance=100, fov=100,
 
 obj = g.get_hyperellipsoid()(position=Point([1, 1, 10]), 
                                direction=Vector([2, 1, 1]), 
-                               semiaxes=[1, 5, 2])
+                               semiaxes=[10, 50, 20])
 
-obj = g.get_hyperplane()(Point([0, 0, 0 ]), normal=Vector([0, 0, 1]))
+obj = g.get_hyperplane()(Point([0, 0, 0 ]), normal=Vector([0, 1, 1]))
 
 canv.update(camera)
 
+# print(canv.distances)
+# g.run(canv, camera)
 
-g.run(canv, camera)
+print(Vector([-0.95399, 0.29166, 0.06954]).vector_product(Vector([0, 0, 1])))
