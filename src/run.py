@@ -31,52 +31,16 @@ g.es = es
 
 canv = g.get_canvas()()
 
-camera = g.camera(Point([0, 0, 1]), draw_distance=100, fov=100,
-                                        direction=Vector([-1, -1, -1]))
+camera = g.camera(Point([0, 0, 5]), draw_distance=100, fov=100,
+                                        direction=Vector([1, 1, 0.1]))
 
-# rays = camera.get_rays_matrix(globals.config["canvas"]["n"], globals.config["canvas"]["m"])
-
-obj = g.get_hyperellipsoid()(position=Point([0, 0, 0]), 
+obj = g.get_hyperellipsoid()(position=Point([1, 1, 10]), 
                                direction=Vector([2, 1, 1]), 
-                               semiaxes=[1, 1, 1])
+                               semiaxes=[1, 5, 2])
 
-obj = g.get_hyperplane()(Point([-100, 1, 2]), normal=Vector([-100, 1, 1]))
+obj = g.get_hyperplane()(Point([0, 0, 0 ]), normal=Vector([0, 0, 1]))
 
 canv.update(camera)
 
+
 g.run(canv, camera)
-
-
-
-
-
-
-
-
-
-
-# es.trigger("move", camera, Vector([1, 1, 1]))
-
-# print(camera.position)
-
-# a = camera.get_rays_matrix(globals.config["canvas"]["n"], globals.config["canvas"]["m"])
-
-# myg = MyGame(cs)
-
-# canv = myg.get_canvas()()
-
-# obj = myg.get_hyperellipsoid()(position=Point([0, 0, 0]), 
-#                                direction=Vector([2, 1, 1]), 
-#                                semiaxes=[1, 1, 1])
-
-# obj = myg.get_hyperplane()(Point([-100, 1, 2]), normal=Vector([-100, 1, 1]))
-
-
-# canv.update(camera)
-
-
-'''
-1. действия над камерой
-    - перемещение
-    - поворот в двух плоскостях
-'''

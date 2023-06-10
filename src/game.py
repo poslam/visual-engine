@@ -22,38 +22,66 @@ class MyGame(Game):
             entities = EntityList()
         super().__init__(cs, es, entities)
 
-    def run(self, canvas, camera):
-        try:
-            matr = canvas.out_matr
-        except:
-            raise EngineException(EngineException.WRONG_INPUT(self.get_canvas()))
-        
-        if matr == None:
-            raise EngineException(EngineException.NEED_UPDATE("canvas"))
-        
+    def run(self, canvas, camera):        
         def main(stdscr):
             stdscr.clear() 
+            
+            k, p = 0, 0
                     
             while True:
+                stdscr.addstr(61, 200, f"camera at: {str(camera.position.values)}")
+                stdscr.addstr(62, 200, f"camera direction: {str(camera.direction.values)}")
+                
                 canvas.update(camera)
+                
+                matr = canvas.out_matr
                 
                 for i in range(matr.rows):
                     for j in range(matr.columns):
                         stdscr.addch(i, j, matr[i][j]) 
-                
+            
                 key = stdscr.getkey() 
                 if key == "l":
                     break
                 if key == "w":
-                    self.es["move", camera, camera.direction]
+                    dist = camera.direction*10
+                    dist[2] = 0
+                    self.es.trigger("move", camera, dist)
+                    k += 1
+                    stdscr.addstr(59, 200, f"{k} move complete")
                 elif key == "s":
-                    self.es["move", camera, (-1)*camera.direction.norm()]
+                    dist = (-1)*camera.direction*10
+                    dist[2] = 0
+                    self.es.trigger("move", camera, dist)
+                    k += 1
+                    stdscr.addstr(59, 200, f"{k} move complete")
                 elif key == "a":
-                    self.es["move", camera, Vector.vector_product(camera.direction.norm(), Vector([0, 0, -1]))]
+                    self.es.trigger("move", camera, 10*Vector.vector_product(camera.direction, Vector([0, 0, -1])))
+                    k += 1
+                    stdscr.addstr(59, 200, f"{k} move complete")
                 elif key == "d":
-                    self.es["move", camera, Vector.vector_product(camera.direction.norm(), Vector([0, 0, 1]))]
-                # elif key == "KEY_UP":
-                #     self.es["rotate"]
+                    self.es.trigger("move", camera, 10*Vector.vector_product(camera.direction, Vector([0, 0, 1])))
+                    k += 1
+                    stdscr.addstr(59, 200, f"{k} move complete")
+                elif key == "KEY_UP":
+                    self.es.trigger("rotate", camera, [0, 2], 20)
+                    self.es.trigger("rotate", camera, [1, 2], 20)
+                    p += 1
+                    stdscr.addstr(60, 200, f"{p} rotate complete")
+                elif key == "KEY_DOWN":
+                    self.es.trigger("rotate", camera, [0, 2], -20)
+                    self.es.trigger("rotate", camera, [1, 2], -20)
+                    p += 1
+                    stdscr.addstr(60, 200, f"{p} rotate complete")
+                elif key == "KEY_RIGHT":
+                    self.es.trigger("rotate", camera, [0, 1], -30)
+                    p += 1
+                    stdscr.addstr(60, 200, f"{p} rotate complete")
+                elif key == "KEY_LEFT":
+                    self.es.trigger("rotate", camera, [0, 1], 30)
+                    p += 1
+                    stdscr.addstr(60, 200, f"{p} rotate complete")
+                
 
         wrapper (main)
 
@@ -181,8 +209,9 @@ class MyGame(Game):
                         
                 charmap = globals.config["charmap"]
                 l = len(charmap)
+                draw_distance = globals.config["camera"]["draw_distance"]
                 
-                step = globals.config["camera"]["draw_distance"] / l    
+                step = draw_distance / l    
                 list_steps = [step*i for i in range(l)]
                 
                 matr = pself.distances
@@ -192,7 +221,8 @@ class MyGame(Game):
                 for i in range(pself.n):
                     for j in range(pself.m):
                         for k in range(l):
-                            if matr[i][j] == 0:
+                            if matr[i][j] == 0 or \
+                                matr[i][j] > draw_distance:
                                 out_matr[i][j] = ' '
                                 break
                             if matr[i][j] < list_steps[k]:

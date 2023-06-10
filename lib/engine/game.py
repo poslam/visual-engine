@@ -71,15 +71,11 @@ class Game:
                 position = Point([round(x, globals.config["precision"])
                                  for x in position.values])
 
-                if direction is not None and direction != Vector([0, 0, 0]):
-                    direction = Vector([round(x, globals.config["precision"])
-                                        for x in direction.norm().values])
-
                 pself.set_direction(direction)
                 pself.set_position(position)
 
             def move(self, direction: Vector):
-                self["position"] = self["position"] + direction
+                self.set_position(self["position"] + direction)
 
             def planar_rotate(self, inds: list[int], angle: float):
                 if not isinstance(self["direction"], Vector):
@@ -99,7 +95,7 @@ class Game:
                 position = Point([round(x, globals.config["precision"])
                                  for x in position.values])
 
-                self.set_property("position", position)
+                self["position"] = position
 
             def set_direction(self, direction: Vector):
                 if direction != None and direction != Vector([0, 0, 0]):

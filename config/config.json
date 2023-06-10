@@ -2,13 +2,13 @@
     "precision": 4,
     "camera":
     {
-        "draw_distance": 1000,
-        "fov": 120 
+        "draw_distance": 100,
+        "fov": 200 
     },
-    "charmap": ".:;><+r*zsvfwqkP694VOGbUAKXH8RD#$B0MNWQ%&@",
+    "charmap": "@&%QWNM0B$#DR8HXKAUbGOV496Pkqwfvsz*r+<>;:.",
     "canvas":
     {
-        "n": 60,
-        "m": 200
+        "n": 20,
+        "m": 80
     }
 }
