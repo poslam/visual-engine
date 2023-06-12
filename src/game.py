@@ -160,7 +160,7 @@ class MyGame(Game):
                     A += ray.direction[i]**2
                     B += (ray.initpoint[i] - self.position[i]) * ray.direction[i]
                     C += (ray.initpoint[i] - self.position[i])**2
-                    D = self.semiaxes[i]**2
+                    D += self.semiaxes[i]**2
 
                 B *= 2
                 C -= D
