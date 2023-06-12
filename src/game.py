@@ -47,14 +47,12 @@ class MyGame(Game):
                     break
                 if key == "w":
                     dist = camera.direction
-                    dist[2] = 0
-                    self.es.trigger("move", camera, dist.norm()*10)
+                    self.es.trigger("move", camera, dist.norm()*30)
                     k += 1
                     stdscr.addstr(59, 180, f"{k} move complete")
                 elif key == "s":
                     dist = (-1)*camera.direction
-                    dist[2] = 0
-                    self.es.trigger("move", camera, dist.norm()*10)
+                    self.es.trigger("move", camera, dist.norm()*30)
                     k += 1
                     stdscr.addstr(59, 180, f"{k} move complete")
                 elif key == "a":

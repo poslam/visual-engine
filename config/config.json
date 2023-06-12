@@ -1,15 +1,15 @@
 {
-    "precision": 11,
+    "precision": 20,
     "camera":
     {
         "move": 5,
         "draw_distance": 3000,
-        "fov": 60
+        "fov": 80
     }, 
-    "charmap": "QWERTYUIOPASDFGHJKLZXCVBNM9876543210qwertyuiopasdfghjklzxcvbnm/][()'§±`;:-.......................................                                                           ",
+    "charmap": "QWERTYUIOPASDFGHJKLZXCVBNM9876543210qwertyuiopasdfghjklzxcvbnm/][()'§±`;:-........................................................                                                           ",
     "canvas":
     {
-        "n": 40,
-        "m": 160
+        "n": 50,
+        "m": 200
     }
 }
