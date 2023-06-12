@@ -4,7 +4,7 @@
     {
         "move": 5,
         "draw_distance": 3000,
-        "fov": 90
+        "fov": 60
     }, 
     "charmap": "QWERTYUIOPASDFGHJKLZXCVBNM9876543210qwertyuiopasdfghjklzxcvbnm/][()'§±`;:-.......................................                                                           ",
     "canvas":

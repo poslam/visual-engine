@@ -38,9 +38,18 @@ camera = g.camera(position=Point([0, 0, 1]), direction=Vector([1, 1, 0]))
 
 obj = g.get_hyperellipsoid()(position=Point([200, 200, 1]), 
                                direction=Vector([2, 1, 1]), 
-                               semiaxes=[0.1, 0.1, 1])
+                               semiaxes=[1, 1, 1])
 
-# obj1 = g.get_hyperplane()(Point([0, 0, 0]), normal=Vector([0, 1, 0]))
+obj1 = g.get_hyperellipsoid()(position=Point([208, 203, 4]), 
+                               direction=Vector([2, 1, 1]), 
+                               semiaxes=[0.1, 3, 3])
+
+obj2 = g.get_hyperellipsoid()(position=Point([198, 203, 4]), 
+                               direction=Vector([2, 1, 1]), 
+                               semiaxes=[0.1, 3, 3])
+
+
+# obj1 = g.get_hyperplane()(Point([10, 10, 0]), normal=Vector([-1, 0, 0]))
 
 canv.update(camera)
 

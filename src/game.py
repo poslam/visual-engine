@@ -48,37 +48,37 @@ class MyGame(Game):
                 if key == "w":
                     dist = camera.direction
                     dist[2] = 0
-                    self.es.trigger("move", camera, dist.norm()*2)
+                    self.es.trigger("move", camera, dist.norm()*10)
                     k += 1
                     stdscr.addstr(59, 180, f"{k} move complete")
                 elif key == "s":
                     dist = (-1)*camera.direction
                     dist[2] = 0
-                    self.es.trigger("move", camera, dist.norm()*2)
+                    self.es.trigger("move", camera, dist.norm()*10)
                     k += 1
                     stdscr.addstr(59, 180, f"{k} move complete")
                 elif key == "a":
-                    self.es.trigger("move", camera, 5*Vector.vector_product(camera.direction, Vector([0, 0, -0.2])))
+                    self.es.trigger("move", camera, 5*Vector.vector_product(camera.direction, Vector([0, 0.2, 0])))
                     k += 1
                     stdscr.addstr(59, 180, f"{k} move complete")
                 elif key == "d":
-                    self.es.trigger("move", camera, 5*Vector.vector_product(camera.direction, Vector([0, 0, -0.2])))
+                    self.es.trigger("move", camera, 5*Vector.vector_product(camera.direction, Vector([0, -0.2, 0])))
                     k += 1
                     stdscr.addstr(59, 180, f"{k} move complete")
                 elif key == "KEY_UP":
-                    self.es.trigger("rotate_ver", camera, camera.direction-Vector([0, 0.001, 0]))
+                    self.es.trigger("rotate_ver", camera, camera.direction-Vector([0, 0.005, 0]))
                     p += 1
                     stdscr.addstr(60, 180, f"{p} rotate complete")
                 elif key == "KEY_DOWN":
-                    self.es.trigger("rotate_ver", camera, camera.direction+Vector([0, 0.001, 0]))
+                    self.es.trigger("rotate_ver", camera, camera.direction+Vector([0, 0.005, 0]))
                     p += 1
                     stdscr.addstr(60, 180, f"{p} rotate complete")
                 elif key == "KEY_RIGHT":
-                    self.es.trigger("rotate_hor", camera, [1, 2], -0.1)
+                    self.es.trigger("rotate_hor", camera, [1, 2], -0.2)
                     p += 1
                     stdscr.addstr(60, 180, f"{p} rotate complete")
                 elif key == "KEY_LEFT":
-                    self.es.trigger("rotate_hor", camera, [1, 2], 0.1)
+                    self.es.trigger("rotate_hor", camera, [1, 2], 0.2)
                     p += 1
                     stdscr.addstr(60, 180, f"{p} rotate complete")
                 # with open("log.txt", 'w') as f:
