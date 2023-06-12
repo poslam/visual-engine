@@ -165,8 +165,23 @@ class Game:
                     look_at_vec = Vector([x for x in self.look_at.values])
                     position_vec = Vector([x for x in self.position.values])
                     
-                    return Ray(globals.cs, self.position, 
-                               (look_at_vec-position_vec).norm())
+                    vec = (look_at_vec-position_vec).norm()
+                    
+                    alpha, beta = self.fov, self.vfov
+                    dalpha, dbeta = alpha/n, beta/m
+                    
+                    for i in range(n):
+                        for j in range(m):
+                            temp_vec = vec.copy()
+                            temp_vec.rotate([0, 1], dalpha*i-alpha/2)
+                            temp_vec.rotate([0, 2], dbeta*j-beta/2)
+                            if (vec&temp_vec) == 0:
+                                raise MathException(MathException.ZERO_DIVISION)
+                            temp_vec = (temp_vec*(vec.len()**2/(vec&temp_vec)))
+                            temp_vec.values = [round(x, globals.config["precision"]) for x in temp_vec.values]
+                            result[i][j] = Ray(self.cs, self.position, temp_vec)
+                    
+                    return result
                     
                 
         return Camera 

@@ -1,4 +1,5 @@
 from curses import wrapper
+from math import sqrt
 from typing import Union
 
 import src.globals as globals
@@ -45,39 +46,39 @@ class MyGame(Game):
                     open('log.txt', 'w').close()
                     break
                 if key == "w":
-                    dist = camera.direction*10
+                    dist = camera.direction
                     dist[2] = 0
-                    self.es.trigger("move", camera, dist)
+                    self.es.trigger("move", camera, dist.norm()*2)
                     k += 1
                     stdscr.addstr(59, 180, f"{k} move complete")
                 elif key == "s":
-                    dist = (-1)*camera.direction*10
+                    dist = (-1)*camera.direction
                     dist[2] = 0
-                    self.es.trigger("move", camera, dist)
+                    self.es.trigger("move", camera, dist.norm()*2)
                     k += 1
                     stdscr.addstr(59, 180, f"{k} move complete")
                 elif key == "a":
-                    self.es.trigger("move", camera, 5*Vector.vector_product(camera.direction, Vector([0, 0, -1])))
+                    self.es.trigger("move", camera, 5*Vector.vector_product(camera.direction, Vector([0, 0, -0.2])))
                     k += 1
                     stdscr.addstr(59, 180, f"{k} move complete")
                 elif key == "d":
-                    self.es.trigger("move", camera, 5*Vector.vector_product(camera.direction, Vector([0, 0, 1])))
+                    self.es.trigger("move", camera, 5*Vector.vector_product(camera.direction, Vector([0, 0, -0.2])))
                     k += 1
                     stdscr.addstr(59, 180, f"{k} move complete")
                 elif key == "KEY_UP":
-                    self.es.trigger("rotate_ver", camera, camera.direction+Vector([0, 0, 0.05]))
+                    self.es.trigger("rotate_ver", camera, camera.direction-Vector([0, 0.001, 0]))
                     p += 1
                     stdscr.addstr(60, 180, f"{p} rotate complete")
                 elif key == "KEY_DOWN":
-                    self.es.trigger("rotate_ver", camera, camera.direction-Vector([0, 0, 0.05]))
+                    self.es.trigger("rotate_ver", camera, camera.direction+Vector([0, 0.001, 0]))
                     p += 1
                     stdscr.addstr(60, 180, f"{p} rotate complete")
                 elif key == "KEY_RIGHT":
-                    self.es.trigger("rotate_hor", camera, [0, 1], -1)
+                    self.es.trigger("rotate_hor", camera, [1, 2], -0.1)
                     p += 1
                     stdscr.addstr(60, 180, f"{p} rotate complete")
                 elif key == "KEY_LEFT":
-                    self.es.trigger("rotate_hor", camera, [0, 1], 1)
+                    self.es.trigger("rotate_hor", camera, [1, 2], 0.1)
                     p += 1
                     stdscr.addstr(60, 180, f"{p} rotate complete")
                 # with open("log.txt", 'w') as f:
@@ -112,8 +113,8 @@ class MyGame(Game):
                 self.normal = normal
 
             def intersection_distance(self, ray: Ray):
-                ray_inp_vec = Vector([x for x in ray.initpoint.values])
-                pos_vec = Vector([x for x in self.position.values])
+                ray_inp_vec = ray.initpoint.as_vector() # x^1
+                pos_vec = self.position.as_vector() # x^0
                 dim = ray.direction.size
 
                 if (self.normal & ray.direction) == 0:
@@ -121,11 +122,14 @@ class MyGame(Game):
 
                 t = -((self.normal & (ray_inp_vec-pos_vec)) /
                       (self.normal & ray.direction))
+                
+                if t <= 0:
+                    return 0
 
                 temp_vec = Vector([ray_inp_vec[i]+ray.direction[i]*t
                                    for i in range(dim)])
 
-                return round(temp_vec.len(), globals.config["precision"])
+                return round(temp_vec.len(), globals.config["precision"])/2
 
             move = restricted
 
@@ -151,33 +155,32 @@ class MyGame(Game):
             def rotate_3d(self, angles: list[Union[int, float]]):
                 direction = self.direction.rotate_3d(angles)
                 self.set_direction(direction)
-
+            
             def intersection_distance(self, ray: Ray):
-                dir, pos = ray.direction, ray.initpoint-self.position
-                dim = ray.direction.size
+                A, B, C, D = [0 for _ in range(4)]
+                for i in range(len(self.semiaxes)):
+                    A += ray.direction[i]**2
+                    B += (ray.initpoint[i] - self.position[i]) * ray.direction[i]
+                    C += (ray.initpoint[i] - self.position[i])**2
+                    D = self.semiaxes[i]**2
 
-                p1 = sum(dir[i]**2/self.semiaxes[i]**2 for i in range(dim))
-                p2 = sum(2*pos[i]*dir[i]/self.semiaxes[i]
-                         ** 2 for i in range(dim))
-                p3 = sum(pos[i]**2/self.semiaxes[i]**2 for i in range(dim)) - 1
+                B *= 2
+                C -= D
 
-                t1 = (-p2 + (p2**2-4*p1*p3)**0.5)/2*p1
-                t2 = (-p2 - (p2**2-4*p1*p3)**0.5)/2*p1
-
-                t = [x for x in [y for y in [t1, t2]
-                                 if isinstance(y, (int, float))] if x > 0]
-
-                if len(t) == 0:
+                discr = B**2 - 4 * A * C
+                if discr < 0:
                     return 0
 
-                t = min(t)
+                sol1, sol2 = (-B - sqrt(discr)) / (2 * A), (-B + sqrt(discr)) / (2 * A)
 
-                intersection_vec = Vector([ray.initpoint[i]+dir[i]*t
-                                           for i in range(dim)])
+                if sol1 < 0:
+                    if sol2 < 0:
+                        return 0
+                    return sol2
+                if sol2 < 0:
+                    return sol1
+                return round(min(sol1, sol2), globals.config["precision"])
 
-                temp = pos.as_vector()
-
-                return round((intersection_vec-temp).len(), globals.config["precision"])
 
         return HyperEllipsoid
 
@@ -227,7 +230,7 @@ class MyGame(Game):
                         for k in range(l):
                             if matr[i][j] == 0 or \
                                 matr[i][j] > draw_distance:
-                                out_matr[i][j] = ' '
+                                out_matr[i][j] = '.'
                                 break
                             if matr[i][j] < list_steps[k]:
                                 out_matr[i][j] = charmap[k]
