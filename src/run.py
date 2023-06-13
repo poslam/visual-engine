@@ -52,10 +52,8 @@ obj3 = g.get_hyperellipsoid()(position=Point([194, 201, -3]),
                                direction=Vector([2, 5, 2]), 
                                semiaxes=[1, 2, 2])
 
-# obj1 = g.get_hyperplane()(Point([10, 10, 0]), normal=Vector([-1, 0, 0]))
+obj1 = g.get_hyperplane()(Point([0, 0, -10]), normal=Vector([0, 0, -1]))
 
 canv.update(camera)
 
 g.run(canv, camera)
-
-# print(obj1.intersection_distance(Ray(cs, camera.position, camera.direction)))
