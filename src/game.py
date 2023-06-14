@@ -216,7 +216,7 @@ class MyGame(Game):
                         for k in range(l):
                             if matr[i][j] == 0 or \
                                 matr[i][j] > draw_distance:
-                                out_matr[i][j] = '-'
+                                out_matr[i][j] = '.'
                                 break
                             if matr[i][j] < list_steps[k]:
                                 out_matr[i][j] = charmap[k]

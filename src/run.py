@@ -36,17 +36,17 @@ canv = g.get_canvas()()
 
 camera = g.camera(position=Point([-100, -100, 1]), direction=Vector([1, 1, 0]))
 
-obj = g.get_hyperellipsoid()(position=Point([200, 200, 1]), 
+obj = g.get_hyperellipsoid()(position=Point([200, 200, 5]), 
                                direction=Vector([2, 1, 1]), 
                                semiaxes=[1, 1, 1])
 
-obj2 = g.get_hyperellipsoid()(position=Point([198, 204, 6]), 
+obj2 = g.get_hyperellipsoid()(position=Point([198, 204, -10]), 
                                direction=Vector([2, 1, 1]), 
-                               semiaxes=[0.1, 1, 3])
+                               semiaxes=[1, 4, 3])
 
 obj3 = g.get_hyperellipsoid()(position=Point([500, 500, -2]), 
                                direction=Vector([2, 5, 2]), 
-                               semiaxes=[1, 2, 2])
+                               semiaxes=[1, 5, 2])
 
 canv.update(camera)
 
