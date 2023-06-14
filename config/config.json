@@ -6,10 +6,10 @@
         "draw_distance": 3000,
         "fov": 80
     }, 
-    "charmap": "QWERTYUIOPASDFGHJKLZXCVBNM9876543210qwertyuiopasdfghjklzxcvbnm/][()'§±`;:-........................................................                                                           ",
+    "charmap": "MNBQWRPAw9876543210fghjkqertyzxcv;:-----------------                           ",
     "canvas":
     {
-        "n": 30,
-        "m": 120
+        "n": 20,
+        "m": 80
     }
 }

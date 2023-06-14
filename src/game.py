@@ -30,9 +30,6 @@ class MyGame(Game):
             k, p = 0, 0
                     
             while True:
-                stdscr.addstr(61, 160, f"camera at: {str(camera.position.values)}")
-                stdscr.addstr(62, 160, f"camera direction: {str(camera.direction.values)}")
-                
                 canvas.update(camera)
                 
                 matr = canvas.out_matr
@@ -48,37 +45,28 @@ class MyGame(Game):
                 if key == "w":
                     dist = camera.direction
                     self.es.trigger("move", camera, dist.norm()*30)
-                    k += 1
-                    stdscr.addstr(59, 160, f"{k} move complete")
+
                 elif key == "s":
                     dist = (-1)*camera.direction
                     self.es.trigger("move", camera, dist.norm()*30)
-                    k += 1
-                    stdscr.addstr(59, 160, f"{k} move complete")
+
                 elif key == "a":
                     self.es.trigger("move", camera, 5*Vector.vector_product(camera.direction, Vector([0, 0.2, 0])))
-                    k += 1
-                    stdscr.addstr(59, 160, f"{k} move complete")
+
                 elif key == "d":
                     self.es.trigger("move", camera, 5*Vector.vector_product(camera.direction, Vector([0, -0.2, 0])))
-                    k += 1
-                    stdscr.addstr(59, 160, f"{k} move complete")
+
                 elif key == "KEY_UP":
                     self.es.trigger("rotate_ver", camera, camera.direction-Vector([0, 0.005, 0]))
-                    p += 1
-                    stdscr.addstr(60, 160, f"{p} rotate complete")
+
                 elif key == "KEY_DOWN":
                     self.es.trigger("rotate_ver", camera, camera.direction+Vector([0, 0.005, 0]))
-                    p += 1
-                    stdscr.addstr(60, 160, f"{p} rotate complete")
+
                 elif key == "KEY_RIGHT":
                     self.es.trigger("rotate_hor", camera, [1, 2], -0.2)
-                    p += 1
-                    stdscr.addstr(60, 160, f"{p} rotate complete")
+
                 elif key == "KEY_LEFT":
                     self.es.trigger("rotate_hor", camera, [1, 2], 0.2)
-                    p += 1
-                    stdscr.addstr(60, 160, f"{p} rotate complete")
                 # with open("log.txt", 'w') as f:
                 #     for i in canvas.distances:
                 #         f.write(str(i)+'\n')
@@ -228,7 +216,7 @@ class MyGame(Game):
                         for k in range(l):
                             if matr[i][j] == 0 or \
                                 matr[i][j] > draw_distance:
-                                out_matr[i][j] = '.'
+                                out_matr[i][j] = '-'
                                 break
                             if matr[i][j] < list_steps[k]:
                                 out_matr[i][j] = charmap[k]
