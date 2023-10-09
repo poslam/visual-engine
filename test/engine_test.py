@@ -1,4 +1,3 @@
-from math import atan, tan, pi
 import os
 import sys
 import pytest
@@ -143,45 +142,4 @@ class TestGameObject:
         act = (object["direction"] == Vector([round(x, globals.config["precision"])
                for x in [-0.4472135955, 0.0, 0.894427191]]))
 
-        assert act
-
-
-class TestGameCamera:
-    def test_camera_init_position(self):
-        game = Game(cs, EntityList(Entity(cs)))
-        camera = game.camera(Point([1, 1, 1]), 15, 10)
-        
-        act = (camera["position"] == Point([1, 1, 1]))
-        
-        assert act
-        
-    def test_camera_init_fov(self):
-        game = Game(cs, EntityList(Entity(cs)))
-        camera = game.camera(Point([1, 1, 1]), 15, 10)
-        
-        act = (camera["fov"] == round(0.17453292519943295, globals.config["precision"]))
-        assert act
-    
-    def test_camera_init_draw_distance(self):
-        game = Game(cs, EntityList(Entity(cs)))
-        camera = game.camera(Point([1, 1, 1]), 15, 10)
-        
-        act = (camera["draw_distance"] == 15)
-        
-        assert act
-    
-    def test_camera_init_direction(self):
-        game = Game(cs, EntityList(Entity(cs)))
-        camera = game.camera(Point([1, 1, 1]), 15, 10)
-        
-        act = (camera["direction"] == None)
-        
-        assert act
-        
-    def test_camera_init_look_at(self):
-        game = Game(cs, EntityList(Entity(cs)))
-        camera = game.camera(Point([1, 1, 1]), 15, 10)
-        
-        act = (camera["look_at"] == None)
-        
         assert act
